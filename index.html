@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>✦ My Disco Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-black: #050508;
+      --card-bg: rgba(16, 16, 24, 0.72);
+      --card-border: rgba(255, 255, 255, 0.09);
+      --text-main: #ffffff;
+      --text-muted: #9ca3b8;
+
+      /* Disco Palette */
+      --disco-pink: #ff2a85;
+      --disco-cyan: #00f5d4;
+      --disco-purple: #9b5de5;
+      --disco-gold: #fee440;
+      --disco-blue: #00bbf9;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-black);
+      color: var(--text-main);
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 4rem 1.25rem 5rem;
+      position: relative;
+    }
+
+    /* Ambient Disco Light Orbs */
+    .disco-ambient {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.26;
+      animation: floatOrb 14s ease-in-out infinite alternate;
+    }
+
+    .orb-1 {
+      width: 340px;
+      height: 340px;
+      background: var(--disco-pink);
+      top: -80px;
+      left: 10%;
+    }
+
+    .orb-2 {
+      width: 380px;
+      height: 380px;
+      background: var(--disco-cyan);
+      bottom: -100px;
+      right: 8%;
+      animation-delay: -4s;
+    }
+
+    .orb-3 {
+      width: 280px;
+      height: 280px;
+      background: var(--disco-purple);
+      top: 40%;
+      left: 55%;
+      animation-delay: -8s;
+    }
+
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(35px, -30px) scale(1.12); }
+    }
+
+    /* Subtle Sparkle Grid */
+    .sparkle-dots {
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.14) 1px, transparent 1px);
+      background-size: 36px 36px;
+      mask-image: radial-gradient(circle at center, black 35%, transparent 85%);
+      -webkit-mask-image: radial-gradient(circle at center, black 35%, transparent 85%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Main Container */
+    .container {
+      width: 100%;
+      max-width: 760px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header & Cute CSS Disco Ball */
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .disco-ball-wrap {
+      position: relative;
+      width: 78px;
+      height: 78px;
+      margin-bottom: 1.25rem;
+      display: grid;
+      place-items: center;
+    }
+
+    .disco-ball {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          rgba(255,255,255,0.22) 0px,
+          rgba(255,255,255,0.22) 2px,
+          transparent 2px,
+          transparent 8px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          rgba(255,255,255,0.22) 0px,
+          rgba(255,255,255,0.22) 2px,
+          transparent 2px,
+          transparent 8px
+        ),
+        conic-gradient(
+          from 45deg,
+          var(--disco-pink),
+          var(--disco-purple),
+          var(--disco-cyan),
+          var(--disco-gold),
+          var(--disco-pink)
+        );
+      box-shadow:
+        inset -10px -10px 20px rgba(0, 0, 0, 0.65),
+        inset 6px 6px 14px rgba(255, 255, 255, 0.65),
+        0 0 28px rgba(255, 42, 133, 0.45),
+        0 0 50px rgba(0, 245, 212, 0.25);
+      animation: spinDisco 12s linear infinite;
+    }
+
+    @keyframes spinDisco {
+      0% { filter: hue-rotate(0deg); transform: rotate(0deg); }
+      100% { filter: hue-rotate(360deg); transform: rotate(360deg); }
+    }
+
+    .star {
+      position: absolute;
+      color: #fff;
+      font-size: 0.9rem;
+      animation: twinkle 2.4s ease-in-out infinite;
+      text-shadow: 0 0 10px var(--disco-cyan);
+      user-select: none;
+    }
+
+    .star-1 { top: -2px; right: 2px; color: var(--disco-gold); }
+    .star-2 { bottom: 4px; left: 0px; font-size: 0.75rem; animation-delay: 0.8s; color: var(--disco-cyan); }
+    .star-3 { top: 12px; left: -6px; font-size: 0.65rem; animation-delay: 1.5s; color: var(--disco-pink); }
+
+    @keyframes twinkle {
+      0%, 100% { transform: scale(0.8) rotate(0deg); opacity: 0.5; }
+      50% { transform: scale(1.3) rotate(20deg); opacity: 1; }
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 5vw, 2.85rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(90deg, #ffffff 0%, #ff85b8 35%, #72efdd 70%, #fee440 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmerText 6s linear infinite;
+      margin-bottom: 0.5rem;
+    }
+
+    @keyframes shimmerText {
+      to { background-position: 200% center; }
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.02rem;
+      max-width: 440px;
+      line-height: 1.5;
+    }
+
+    /* Sites Grid */
+    .sites-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 1.15rem;
+    }
+
+    /* Site Card */
+    .site-card {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.15rem 1.25rem;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 22px;
+      text-decoration: none;
+      color: var(--text-main);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  border-color 0.3s ease,
+                  box-shadow 0.3s ease,
+                  background 0.3s ease;
+      overflow: hidden;
+    }
+
+    /* Iridescent Hover Glow */
+    .site-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 22px;
+      padding: 1.5px;
+      background: linear-gradient(135deg, var(--disco-pink), var(--disco-purple), var(--disco-cyan), var(--disco-gold));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .site-card:hover {
+      transform: translateY(-5px) scale(1.015);
+      background: rgba(24, 24, 36, 0.88);
+      box-shadow:
+        0 14px 32px -10px rgba(0, 0, 0, 0.8),
+        0 0 24px -4px rgba(255, 42, 133, 0.28),
+        0 0 24px -4px rgba(0, 245, 212, 0.22);
+    }
+
+    .site-card:hover::before {
+      opacity: 1;
+    }
+
+    .site-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .site-card:hover .site-icon {
+      transform: rotate(-6deg) scale(1.08);
+    }
+
+    .site-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .site-title-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .site-title {
+      font-weight: 600;
+      font-size: 1.06rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .site-tag {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.16rem 0.5rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--disco-cyan);
+      flex-shrink: 0;
+    }
+
+    .site-desc {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .site-arrow {
+      color: var(--text-muted);
+      font-size: 1.15rem;
+      transition: transform 0.25s ease, color 0.25s ease;
+    }
+
+    .site-card:hover .site-arrow {
+      transform: translate(3px, -3px);
+      color: #ffffff;
+    }
+
+    /* Delete Button in Edit Mode */
+    .delete-btn {
+      display: none;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 42, 133, 0.9);
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      z-index: 3;
+      place-items: center;
+      font-size: 0.8rem;
+    }
+
+    body.edit-mode .delete-btn {
+      display: grid;
+    }
+
+    body.edit-mode .site-card {
+      animation: wiggle 0.4s ease-in-out infinite alternate;
+    }
+
+    @keyframes wiggle {
+      from { transform: rotate(-0.5deg); }
+      to { transform: rotate(0.5deg); }
+    }
+
+    /* Bottom Controls (Add / Edit / Export HTML) */
+    .controls-bar {
+      margin-top: 2.75rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.65rem;
+    }
+
+    .pill-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.84rem;
+      font-weight: 500;
+      padding: 0.55rem 1rem;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .pill-btn:hover {
+      color: #fff;
+      border-color: var(--disco-cyan);
+      background: rgba(0, 245, 212, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .pill-btn.primary {
+      background: linear-gradient(135deg, rgba(255, 42, 133, 0.25), rgba(155, 93, 229, 0.25));
+      border-color: rgba(255, 42, 133, 0.45);
+      color: #fff;
+    }
+
+    .pill-btn.primary:hover {
+      box-shadow: 0 0 20px rgba(255, 42, 133, 0.35);
+    }
+
+    /* Modal for Adding a Site */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(8px);
+      display: none;
+      place-items: center;
+      padding: 1rem;
+      z-index: 50;
+    }
+
+    .modal-backdrop.open {
+      display: grid;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 420px;
+      background: #0e0e16;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 24px;
+      padding: 1.75rem;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(155, 93, 229, 0.25);
+    }
+
+    .modal h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.35rem;
+      margin-bottom: 1.15rem;
+    }
+
+    .field {
+      margin-bottom: 0.95rem;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .field input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 0.7rem 0.85rem;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.92rem;
+      outline: none;
+    }
+
+    .field input:focus {
+      border-color: var(--disco-cyan);
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: 0.75rem;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.6rem;
+      margin-top: 1.35rem;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #141422;
+      border: 1px solid var(--disco-cyan);
+      color: #fff;
+      padding: 0.6rem 1.15rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      z-index: 60;
+      box-shadow: 0 0 20px rgba(0, 245, 212, 0.3);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    footer {
+      margin-top: 2.5rem;
+      font-size: 0.8rem;
+      color: rgba(156, 163, 184, 0.55);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Disco Glow -->
+  <div class="disco-ambient">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+  <div class="sparkle-dots"></div>
+
+  <main class="container">
+    <!-- HEADER: Customize your title & bio here -->
+    <header>
+      <div class="disco-ball-wrap" aria-hidden="true">
+        <div class="disco-ball"></div>
+        <span class="star star-1">✦</span>
+        <span class="star star-2">✦</span>
+        <span class="star star-3">✧</span>
+      </div>
+      <h1>my little corner</h1>
+      <p class="subtitle">A tiny disco directory of my favorite links, projects & shiny things on the internet.</p>
+    </header>
+
+    <!-- ============================================================
+         SITES GRID: Copy & paste any <a class="site-card"> block below
+         to hardcode new sites directly into your HTML!
+         ============================================================ -->
+    <section class="sites-grid" id="sitesGrid">
+
+      <a class="site-card" href="https://example.com" target="_blank" rel="noopener noreferrer">
+        <div class="site-icon">🪩</div>
+        <div class="site-info">
+          <div class="site-title-row">
+            <span class="site-title">My Portfolio</span>
+            <span class="site-tag">Main</span>
+          </div>
+          <p class="site-desc">Design, code & creative experiments</p>
+        </div>
+        <span class="site-arrow">↗</span>
+      </a>
+
+      <a class="site-card" href="https://example.com" target="_blank" rel="noopener noreferrer">
+        <div class="site-icon">✨</div>
+        <div class="site-info">
+          <div class="site-title-row">
+            <span class="site-title">Moodboard</span>
+            <span class="site-tag" style="color: #ff70a6;">Inspo</span>
+          </div>
+          <p class="site-desc">Visual bookmarks & late-night ideas</p>
+        </div>
+        <span class="site-arrow">↗</span>
+      </a>
+
+      <a class="site-card" href="https://example.com" target="_blank" rel="noopener noreferrer">
+        <div class="site-icon">🎧</div>
+        <div class="site-info">
+          <div class="site-title-row">
+            <span class="site-title">Disco Rotation</span>
+            <span class="site-tag" style="color: #fee440;">Music</span>
+          </div>
+          <p class="site-desc">Current playlists & favorite mixes</p>
+        </div>
+        <span class="site-arrow">↗</span>
+      </a>
+
+      <a class="site-card" href="https://example.com" target="_blank" rel="noopener noreferrer">
+        <div class="site-icon">🚀</div>
+        <div class="site-info">
+          <div class="site-title-row">
+            <span class="site-title">Coming Soon</span>
+            <span class="site-tag" style="color: #c77dff;">WIP</span>
+          </div>
+          <p class="site-desc">Next secret project loading...</p>
+        </div>
+        <span class="site-arrow">↗</span>
+      </a>
+
+    </section>
+
+    <!-- Optional Quick-Manage Bar -->
+    <div class="controls-bar">
+      <button class="pill-btn primary" id="openModalBtn">+ Add Site</button>
+      <button class="pill-btn" id="toggleEditBtn">✎ Edit</button>
+      <button class="pill-btn" id="copyHtmlBtn">⎘ Copy Updated HTML</button>
+    </div>
+
+    <footer>made with stardust ✦</footer>
+  </main>
+
+  <!-- Add Site Modal -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal">
+      <h2>✦ Add a New Site</h2>
+      <form id="addSiteForm">
+        <div class="field-row">
+          <div class="field">
+            <label for="siteEmoji">Icon / Emoji</label>
+            <input type="text" id="siteEmoji" value="💖" maxlength="4" required />
+          </div>
+          <div class="field">
+            <label for="siteName">Site Name</label>
+            <input type="text" id="siteName" placeholder="e.g. My Blog" required />
+          </div>
+        </div>
+        <div class="field">
+          <label for="siteUrl">URL</label>
+          <input type="url" id="siteUrl" placeholder="https://..." required />
+        </div>
+        <div class="field-row" style="grid-template-columns: 110px 1fr;">
+          <div class="field">
+            <label for="siteTag">Tag</label>
+            <input type="text" id="siteTag" placeholder="New" maxlength="12" />
+          </div>
+          <div class="field">
+            <label for="siteDesc">Short Description</label>
+            <input type="text" id="siteDesc" placeholder="What's this link about?" />
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="pill-btn" id="closeModalBtn">Cancel</button>
+          <button type="submit" class="pill-btn primary">Save Site ✦</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Copied!</div>
+
+  <script>
+    const STORAGE_KEY = 'disco_
