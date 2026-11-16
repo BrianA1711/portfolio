@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Whitechapel 1888 — Historical Case File</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* User Custom Color Palette */
+      --bg-void: #01000a;
+      --bg-indigo: #0f0729;
+      --accent-crimson: #7a0000;
+      --accent-ochre: #6b4a0c;
+      --accent-teal: #065559;
+      --surface-navy: #011947;
+      --surface-violet: #2f0945;
+
+      /* High-Contrast Clean Typography */
+      --text-primary: #f4f4f8;
+      --text-secondary: #a8adc4;
+      --text-muted: #6f7591;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-void);
+      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 15% 15%, rgba(47, 9, 69, 0.35) 0%, transparent 45%),
+        radial-gradient(circle at 85% 35%, rgba(1, 25, 71, 0.45) 0%, transparent 50%),
+        radial-gradient(circle at 50% 85%, rgba(122, 0, 0, 0.18) 0%, transparent 55%),
+        linear-gradient(180deg, var(--bg-void) 0%, var(--bg-indigo) 50%, var(--bg-void) 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.65;
+    }
+
+    /* Ambient Atmospheric Canvas */
+    #atmosphere-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.65;
+    }
+
+    /* Top Minimal Header & Animated Progress Bar */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(1, 0, 10, 0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .progress-track {
+      height: 2px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-teal), var(--accent-ochre), var(--accent-crimson));
+      transition: width 0.25s ease-out;
+    }
+
+    .nav-container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0.9rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+    }
+
+    .brand-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--accent-crimson);
+      box-shadow: 0 0 12px var(--accent-crimson);
+      animation: pulseDot 2.4s infinite ease-in-out;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.55; }
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      transition: all 0.25s ease;
+      border: 1px solid transparent;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--text-primary);
+      background: rgba(1, 25, 71, 0.65);
+      border-color: rgba(6, 85, 89, 0.5);
+    }
+
+    .play-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, var(--accent-crimson), #4a0000);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 0.45rem 0.95rem;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .play-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(122, 0, 0, 0.45);
+    }
+
+    .play-btn.playing {
+      background: linear-gradient(135deg, var(--accent-teal), var(--surface-navy));
+      border-color: rgba(6, 85, 89, 0.8);
+    }
+
+    /* Main Layout */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 6.5rem 1.5rem 5rem;
+    }
+
+    section {
+      padding: 4.5rem 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    section:last-of-type {
+      border-bottom: none;
+    }
+
+    /* Scroll Reveal Animations */
+    .reveal {
+      opacity: 0;
+      transform: translateY(26px);
+      transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 76vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-top: 2rem;
+    }
+
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #d4a348;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .eyebrow::before {
+      content: "";
+      display: inline-block;
+      width: 24px;
+      height: 1px;
+      background: var(--accent-ochre);
+    }
+
+    h1 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(2.8rem, 6vw, 4.8rem);
+      font-weight: 700;
+      line-height: 1.06;
+      letter-spacing: -0.01em;
+      margin-bottom: 1.4rem;
+      max-width: 820px;
+    }
+
+    h1 span {
+      color: #c92a2a;
+      font-style: italic;
+    }
+
+    .hero-subtitle {
+      font-size: 1.12rem;
+      color: var(--text-secondary);
+      max-width: 650px;
+      font-weight: 300;
+      margin-bottom: 2.5rem;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .stat-card {
+      background: linear-gradient(145deg, rgba(15, 7, 41, 0.85), rgba(1, 25, 71, 0.45));
+      border: 1px solid var(--border-subtle);
+      border-left: 3px solid var(--accent-ochre);
+      padding: 1.2rem 1.35rem;
+      border-radius: 10px;
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+
+    .stat-card:nth-child(2) { border-left-color: var(--accent-crimson); }
+    .stat-card:nth-child(3) { border-left-color: var(--accent-teal); }
+    .stat-card:nth-child(4) { border-left-color: var(--surface-violet); }
+
+    .stat-card:hover {
+      transform: translateY(-3px);
+    }
+
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--text-primary);
+    }
+
+    .stat-label {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+      letter-spacing: 0.02em;
+    }
+
+    /* Section Headings */
+    .section-header {
+      margin-bottom: 2.5rem;
+    }
+
+    .chapter-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.74rem;
+      color: #46b5bb;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      font-weight: 700;
+      line-height: 1.15;
+    }
+
+    /* Two-Column Cards */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: rgba(15, 7, 41, 0.72);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.75rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(107, 74, 12, 0.65);
+      transform: translateY(-2px);
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--surface-navy), var(--accent-teal), transparent);
+      opacity: 0.8;
+    }
+
+    .card.crimson::after {
+      background: linear-gradient(90deg, var(--accent-crimson), var(--accent-ochre), transparent);
+    }
+
+    .card.violet::after {
+      background: linear-gradient(90deg, var(--surface-violet), var(--surface-navy), transparent);
+    }
+
+    .card h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      background: rgba(1, 25, 71, 0.9);
+      border: 1px solid rgba(6, 85, 89, 0.5);
+      color: #6dd5da;
+      text-transform: uppercase;
+    }
+
+    .badge.unknown {
+      background: rgba(122, 0, 0, 0.35);
+      border-color: rgba(122, 0, 0, 0.7);
+      color: #ff9e9e;
+    }
+
+    .badge.ochre {
+      background: rgba(107, 74, 12, 0.35);
+      border-color: rgba(107, 74, 12, 0.75);
+      color: #f3c878;
+    }
+
+    .card p {
+      color: var(--text-secondary);
+      font-size: 0.94rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .card p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Interactive Whitechapel Map & Victim Explorer */
+    .explorer-shell {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 1.5rem;
+      background: linear-gradient(160deg, rgba(1, 25, 71, 0.45), rgba(15, 7, 41, 0.85));
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 1.5rem;
+    }
+
+    @media (max-width: 860px) {
+      .explorer-shell {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .map-stage {
+      background: var(--bg-void);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .map-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    svg#whitechapel-map {
+      width: 100%;
+      height: 310px;
+      display: block;
+    }
+
+    .street-line {
+      stroke: rgba(255, 255, 255, 0.09);
+      stroke-width: 1.5;
+      fill: none;
+    }
+
+    .street-major {
+      stroke: rgba(107, 74, 12, 0.35);
+      stroke-width: 3;
+      fill: none;
+    }
+
+    .trail-path {
+      fill: none;
+      stroke: var(--accent-crimson);
+      stroke-width: 2;
+      stroke-dasharray: 6 5;
+      opacity: 0.75;
+    }
+
+    .map-pin {
+      cursor: pointer;
+      transition: transform 0.25s ease;
+    }
+
+    .map-pin circle.outer {
+      fill: rgba(122, 0, 0, 0.25);
+      stroke: var(--accent-crimson);
+      stroke-width: 1.5;
+      transition: all 0.3s ease;
+    }
+
+    .map-pin circle.inner {
+      fill: #e03131;
+    }
+
+    .map-pin.active circle.outer {
+      fill: rgba(122, 0, 0, 0.55);
+      stroke: #ff6b6b;
+      stroke-width: 2.5;
+      r: 16;
+    }
+
+    .map-pin text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      fill: var(--text-secondary);
+      pointer-events: none;
+    }
+
+    .map-pin.active text {
+      fill: #ffffff;
+      font-weight: 600;
+    }
+
+    .victim-tabs {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      margin-top: 0.75rem;
+    }
+
+    .v-tab {
+      background: rgba(15, 7, 41, 0.9);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      padding: 0.4rem 0.65rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .v-tab:hover {
+      border-color: var(--accent-ochre);
+      color: var(--text-primary);
+    }
+
+    .v-tab.active {
+      background: var(--accent-crimson);
+      border-color: #ff6b6b;
+      color: #fff;
+    }
+
+    .victim-detail {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0.5rem;
+      animation: fadeSlide 0.35s ease;
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateX(8px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .victim-date {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: #e5b55c;
+      margin-bottom: 0.35rem;
+    }
+
+    .victim-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 0.4rem;
+    }
+
+    .victim-loc {
+      font-size: 0.85rem;
+      color: #5bc2c7;
+      margin-bottom: 1.1rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .victim-bio {
+      color: var(--text-secondary);
+      font-size: 0.94rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .historical-note {
+      background: rgba(47, 9, 69, 0.45);
+      border-left: 3px solid var(--accent-teal);
+      padding: 0.85rem 1rem;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+    }
+
+    /* Timeline List for Ending & Legacy */
+    .timeline {
+      position: relative;
+      padding-left: 1.8rem;
+      border-left: 1px solid rgba(107, 74, 12, 0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+    }
+
+    .timeline-item {
+      position: relative;
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: -2.18rem;
+      top: 0.35rem;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--bg-indigo);
+      border: 2px solid var(--accent-ochre);
+    }
+
+    .timeline-item.crimson::before {
+      border-color: var(--accent-crimson);
+      background: var(--accent-crimson);
+    }
+
+    .timeline-item.teal::before {
+      border-color: var(--accent-teal);
+      background: var(--accent-teal);
+    }
+
+    .t-date {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: #e5b55c;
+      margin-bottom: 0.25rem;
+    }
+
+    .t-title {
+      font-weight: 600;
+      font-size: 1.05rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .t-desc {
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2.5rem 1.5rem 3.5rem;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      border-top: 1px solid var(--border-subtle);
+      position: relative;
+      z-index: 1;
+    }
+
+    .palette-strip {
+      display: inline-flex;
+      gap: 6px;
+      margin-top: 0.85rem;
+    }
+
+    .swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    @media (max-width: 720px) {
+      .nav-links {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Fog & Dust Particle Canvas -->
+  <canvas id="atmosphere-canvas"></canvas>
+
+  <!-- Fixed Minimal Navigation -->
+  <header>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <div class="nav-container">
+      <div class="brand">
+        <span class="brand-dot"></span>
+        <span>ARCHIVE // WHITECHAPEL 1888</span>
+      </div>
+      <nav class="nav-links" aria-label="Chapters">
+        <a href="#origins">01. How It Started</a>
+        <a href="#identity">02. Parents & Identity</a>
+        <a href="#victims">03. The Five Victims</a>
+        <a href="#ending">04. How It Ended</a>
+      </nav>
+      <button class="play-btn" id="auto-tour-btn" title="Auto-advance through the animated history">
+        <span id="play-icon">&#9654;</span>
+        <span id="play-label">Play Animated Tour</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero reveal" id="top">
+      <div class="eyebrow">Historical Case Dossier &bull; East End, London</div>
+      <h1>The Mystery of <span>Jack the Ripper</span></h1>
+      <p class="hero-subtitle">
+        A clear, historically grounded look at the Autumn of Terror in 1888—how the crisis began in Victorian London, what historians know about the perpetrator's background, the five women at the center of the case, and why the killings abruptly stopped.
+      </p>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-num" data-target="1888">1888</div>
+          <div class="stat-label">Year of the Autumn of Terror</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" data-target="5">5</div>
+          <div class="stat-label">Canonical Victims (Aug–Nov)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" data-target="11">11</div>
+          <div class="stat-label">Total Whitechapel Police File</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" data-target="0">0</div>
+          <div class="stat-label">Confirmed Identities Found</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 1: HOW IT STARTED -->
+    <section id="origins" class="reveal">
+      <div class="section-header">
+        <span class="chapter-tag">Chapter 01 // Context &amp; Spark</span>
+        <h2>How It Started: Whitechapel in 1888</h2>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Victorian London's Divided City <span class="badge ochre">Social Context</span></h3>
+          <p>
+            In the late 1880s, London was the wealthiest imperial capital in the world, yet just a mile east of the financial district lay <strong>Whitechapel</strong>—a densely overcrowded district of narrow gas-lit alleys, workhouses, and shared lodging houses ("doss-houses") where thousands lived in extreme poverty.
+          </p>
+          <p>
+            Economic depression, severe unemployment, and anti-immigrant tensions created a volatile environment where street crime was common and police resources were stretched thin.
+          </p>
+        </div>
+
+        <div class="card crimson">
+          <h3>The Escalation &amp; The Name <span class="badge">Aug – Sept 1888</span></h3>
+          <p>
+            Scotland Yard opened the "Whitechapel Murders" file in April 1888 following attacks on Emma Elizabeth Smith and Martha Tabram. However, historians mark the true start of the Ripper series on <strong>August 31, 1888</strong>, with the murder of Mary Ann Nichols.
+          </p>
+          <p>
+            In late September 1888, the Central News Agency received a letter written in red ink signed <em>"Jack the Ripper."</em> Though modern historians believe a journalist likely fabricated the letter to boost newspaper sales, the nickname instantly stuck worldwide.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 2: WHO HIS PARENTS WERE & IDENTITY -->
+    <section id="identity" class="reveal">
+      <div class="section-header">
+        <span class="chapter-tag">Chapter 02 // Origins &amp; Genealogy</span>
+        <h2>Who Were His Parents? The Unsolved Identity</h2>
+      </div>
+
+      <div class="grid-2">
+        <div class="card crimson">
+          <h3>The Direct Historical Answer <span class="badge unknown">Unknown</span></h3>
+          <p>
+            <strong>We do not know who Jack the Ripper's parents were</strong> because his true identity was never discovered. Unlike mythical villains with known backstories, "Jack the Ripper" was a media alias given to an unidentified perpetrator.
+          </p>
+          <p>
+            In 1888, policing lacked modern forensic science—there was no DNA profiling, no blood-type matching, and fingerprinting was not yet adopted by Scotland Yard. Without a verified name or birth record, his parentage and childhood remain completely unknown.
+          </p>
+        </div>
+
+        <div class="card violet">
+          <h3>What Investigators &amp; Suspects Suggest <span class="badge">Historical Profile</span></h3>
+          <p>
+            Contemporary police surgeons and modern criminal profilers concluded the killer was likely a local male resident of Whitechapel who blended easily into the neighborhood, held a steady daytime job, and knew its labyrinth of alleys intimately.
+          </p>
+          <p>
+            Over 100 suspects have been proposed—ranging from troubled local laborers like <strong>Aaron Kosminski</strong> (son of Polish-Jewish immigrants Abram and Golda) to educated professionals like <strong>Montague John Druitt</strong> (son of Dorset surgeon William Druitt). None has ever been proven beyond doubt.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 3: WHO HE KILLED (INTERACTIVE MAP + DOSSIER) -->
+    <section id="victims" class="reveal">
+      <div class="section-header">
+        <span class="chapter-tag">Chapter 03 // The Canonical Five</span>
+        <h2>Who He Killed: The Women of Whitechapel</h2>
+      </div>
+
+      <p style="color: var(--text-secondary); max-width: 760px; margin-bottom: 1.75rem; font-size: 0.96rem;">
+        While London police investigated 11 separate deaths in the area between 1888 and 1891, historians and investigators agree that <strong>five specific victims</strong>—known as the <em>Canonical Five</em>—were killed by the same person over a ten-week period. Select each location on the map or tabs below to explore their lives.
+      </p>
+
+      <div class="explorer-shell">
+        <!-- Animated Interactive SVG Map -->
+        <div class="map-stage">
+          <div class="map-header">
+            <span>WHITECHAPEL &amp; SPITALFIELDS SECTOR</span>
+            <span id="map-coords">51.5155° N, 0.0722° W</span>
+          </div>
+
+          <svg id="whitechapel-map" viewBox="0 0 460 280" role="img" aria-label="Map of Whitechapel 1888 locations">
+            <!-- Stylized 1888 Street Grid -->
+            <path class="street-major" d="M 20,210 L 210,165 L 440,120" />
+            <path class="street-major" d="M 165,20 L 185,260" />
+            <path class="street-line" d="M 60,50 L 390,45" />
+            <path class="street-line" d="M 40,115 L 420,90" />
+            <path class="street-line" d="M 90,250 L 380,215" />
+            <path class="street-line" d="M 285,30 L 315,255" />
+            <path class="street-line" d="M 95,30 L 110,255" />
+
+            <!-- Street Labels -->
+            <text x="295" y="138" fill="#6f7591" font-family="JetBrains Mono" font-size="9" transform="rotate(-11 295 138)">WHITECHAPEL HIGH ST</text>
+            <text x="148" y="85" fill="#6f7591" font-family="JetBrains Mono" font-size="9" transform="rotate(84 148 85)">COMMERCIAL ST</text>
+
+            <!-- Chronological Connecting Path -->
+            <path class="trail-path" d="M 375,112 L 245,88 L 285,212 L 85,188 L 195,95" />
+
+            <!-- 5 Interactive Map Pins -->
+            <g class="map-pin active" data-index="0" transform="translate(375, 112)">
+              <circle class="outer" r="12"></circle>
+              <circle class="inner" r="4"></circle>
+              <text x="-28" y="-16">1. Aug 31</text>
+            </g>
+
+            <g class="map-pin" data-index="1" transform="translate(245, 88)">
+              <circle class="outer" r="12"></circle>
+              <circle class="inner" r="4"></circle>
+              <text x="-26" y="-16">2. Sep 08</text>
+            </g>
+
+            <g class="map-pin" data-index="2" transform="translate(285, 212)">
+              <circle class="outer" r="12"></circle>
+              <circle class="inner" r="4"></circle>
+              <text x="-26" y="24">3. Sep 30</text>
+            </g>
+
+            <g class="map-pin" data-index="3" transform="translate(85, 188)">
+              <circle class="outer" r="12"></circle>
+              <circle class="inner" r="4"></circle>
+              <text x="-26" y="24">4. Sep 30</text>
+            </g>
+
+            <g class="map-pin" data-index="4" transform="translate(195, 95)">
+              <circle class="outer" r="12"></circle>
+              <circle class="inner" r="4"></circle>
+              <text x="-26" y="-16">5. Nov 09</text>
+            </g>
+          </svg>
+
+          <div class="victim-tabs" id="victim-tabs">
+            <button class="v-tab active" data-index="0">01. Nichols</button>
+            <button class="v-tab" data-index="1">02. Chapman</button>
+            <button class="v-tab" data-index="2">03. Stride</button>
+            <button class="v-tab" data-index="3">04. Eddowes</button>
+            <button class="v-tab" data-index="4">05. Kelly</button>
+          </div>
+        </div>
+
+        <!-- Victim Historical Profile -->
+        <div class="victim-detail" id="victim-detail">
+          <div class="victim-date" id="v-date">AUGUST 31, 1888 &bull; AGE 43</div>
+          <h3 class="victim-name" id="v-name">Mary Ann "Polly" Nichols</h3>
+          <div class="victim-loc" id="v-loc">Location: Buck's Row (now Durward Street), Whitechapel</div>
+          <p class="victim-bio" id="v-bio">
+            Born in London in 1845, Mary Ann Nichols was a mother of five whose life was destabilized by poverty and alcohol following the breakdown of her marriage. Unable to afford a four-penny bed at her Thrawl Street lodging house that night, she was killed in the early hours of August 31.
+          </p>
+          <div class="historical-note" id="v-note">
+            <strong>Historical Significance:</strong> Her death marked the unmistakable beginning of the Ripper panic and led Scotland Yard to assign senior detectives to Whitechapel.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHAPTER 4: HOW IT ENDED (OR IF IT ENDED) -->
+    <section id="ending" class="reveal">
+      <div class="section-header">
+        <span class="chapter-tag">Chapter 04 // Resolution &amp; Theories</span>
+        <h2>How It Ended—Or Did It?</h2>
+      </div>
+
+      <div class="grid-2" style="align-items: start;">
+        <div class="timeline">
+          <div class="timeline-item crimson">
+            <div class="t-date">NOVEMBER 9, 1888</div>
+            <div class="t-title">The Sudden Stop</div>
+            <div class="t-desc">
+              Following the murder of Mary Jane Kelly at Miller's Court—the only canonical attack committed indoors—the Ripper's killings abruptly ceased. No confirmed canonical murders occurred after November 1888.
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="t-date">1889 – 1891</div>
+            <div class="t-title">False Alarms &amp; Later Cases</div>
+            <div class="t-desc">
+              A few subsequent Whitechapel murders (such as Alice McKenzie in 1889 and Frances Coles in 1891) sparked brief fears that the killer had returned, but investigators concluded they were unrelated crimes.
+            </div>
+          </div>
+
+          <div class="timeline-item teal">
+            <div class="t-date">1892 &amp; BEYOND</div>
+            <div class="t-title">Official Closure of the File</div>
+            <div class="t-desc">
+              Scotland Yard officially closed the Whitechapel Murders investigation in 1892 without making an arrest or bringing charges. While the crimes ended in 1888, the historical mystery never did.
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Why Historians Believe the Killings Stopped <span class="badge ochre">Leading Theories</span></h3>
+          <p>
+            Serial offenders rarely stop voluntarily without an external intervention. Most historians agree the murders ended in late 1888 for one of four practical reasons:
+          </p>
+          <p>
+            <strong>1. Death:</strong> In an era of high mortality from tuberculosis, pneumonia, and street accidents, the killer may have died shortly after November 1888.
+          </p>
+          <p>
+            <strong>2. Institutionalization:</strong> Police memos from the 1890s noted a prime suspect had been committed to a Victorian lunatic asylum, ending his ability to roam Whitechapel.
+          </p>
+          <p>
+            <strong>3. Imprisonment or Emigration:</strong> He may have been jailed for an unrelated theft or assault, or boarded a ship out of London's busy docks to America or Australia.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div>Historical Case Study &bull; Clean Minimal Archive Presentation</div>
+    <div class="palette-strip" title="Custom Color Palette Applied">
+      <span class="swatch" style="background:#0f0729"></span>
+      <span class="swatch" style="background:#7a0000"></span>
+      <span class="swatch" style="background:#6b4a0c"></span>
+      <span class="swatch" style="background:#065559"></span>
+      <span class="swatch" style="background:#011947"></span>
+      <span class="swatch" style="background:#2f0945"></span>
+      <span class="swatch" style="background:#01000a"></span>
+    </div>
+  </footer>
+
+  <script>
+    // 1. Canonical Five Historical Dataset
+    const victimsData = [
+      {
+        date: "AUGUST 31, 1888 • AGE 43",
+        name: 'Mary Ann "Polly" Nichols',
+        loc: "Location: Buck's Row (now Durward Street), Whitechapel",
+        coords: "51.5204° N, 0.0601° W",
+        bio: "Born in London in 1845, Mary Ann Nichols was a mother of five whose life was destabilized by poverty and alcohol following the breakdown of her marriage. Unable to afford a four-penny bed at her Thrawl Street lodging house that night, she was killed in the early hours of August 31.",
+        note: "Historical Significance: Her death marked the unmistakable beginning of the Ripper panic and led Scotland Yard to assign senior detectives to Whitechapel."
+      },
+      {
+        date: "SEPTEMBER 8, 1888 • AGE 47",
+        name: "Annie Chapman",
+        loc: "Location: 29 Hanbury Street, Spitalfields",
+        coords: "51.5201° N, 0.0725° W",
+        bio: "Born Eliza Ann Smith, Annie Chapman had previously lived comfortably as the wife of a coachman in Windsor before illness and personal tragedy left her impoverished in East London. She earned a modest living selling crocheted items and flowers.",
+        note: "Historical Significance: Attacked in a residential backyard just before dawn, confirming to police that a single serial offender was operating in the district."
+      },
+      {
+        date: "SEPTEMBER 30, 1888 • AGE 44",
+        name: "Elizabeth Stride",
+        loc: "Location: Dutfield's Yard, Berner Street",
+        coords: "51.5138° N, 0.0642° W",
+        bio: "Born Elisabeth Gustafsdotter in Gothenburg, Sweden, she immigrated to London in 1866. Known by neighbors as 'Long Liz,' she worked as a domestic cleaner and lived intermittently in Spitalfields lodging houses.",
+        note: "Historical Significance: The first victim of the infamous 'Double Event.' The perpetrator was likely interrupted by a cart entering the yard, striking again 45 minutes later."
+      },
+      {
+        date: "SEPTEMBER 30, 1888 • AGE 46",
+        name: "Catherine Eddowes",
+        loc: "Location: Mitre Square, City of London",
+        coords: "51.5139° N, 0.0772° W",
+        bio: "Born in Wolverhampton, Catherine Eddowes worked as a tinplate stamper and seasonal hop-picker in Kent. She had just been released from Bishopsgate police station after sobering up hours before encountering the killer.",
+        note: "Historical Significance: Mitre Square lay inside the City of London boundary, bringing a second independent police force into the investigation."
+      },
+      {
+        date: "NOVEMBER 9, 1888 • AGE 25",
+        name: "Mary Jane Kelly",
+        loc: "Location: 13 Miller's Court, Dorset Street",
+        coords: "51.5186° N, 0.0749° W",
+        bio: "Originally from Ireland and raised in Wales, Mary Jane Kelly was by far the youngest of the canonical victims and the only one who rented her own private single room rather than sleeping in communal lodging houses.",
+        note: "Historical Significance: Widely regarded by historians as the final canonical victim. After November 9, the Ripper's killings abruptly ended."
+      }
+    ];
+
+    let currentVictim = 0;
+
+    function selectVictim(index) {
+      currentVictim = index;
+      const data = victimsData[index];
+
+      // Update Map Pins
+      document.querySelectorAll('.map-pin').forEach((pin, idx) => {
+        pin.classList.toggle('active', idx === index);
+      });
+
+      // Update Tabs
+      document.querySelectorAll('.v-tab').forEach((tab, idx) => {
+        tab.classList.toggle('active', idx === index);
+      });
+
+      // Animate Detail Panel Refresh
+      const detailBox = document.getElementById('victim-detail');
+      detailBox.style.animation = 'none';
+      detailBox.offsetHeight; // trigger reflow
+      detailBox.style.animation = 'fadeSlide 0.35s ease';
+
+      document.getElementById('v-date').textContent = data.date;
+      document.getElementById('v-name').textContent = data.name;
+      document.getElementById('v-loc').textContent = data.loc;
+      document.getElementById('v-bio').textContent = data.bio;
+      document.getElementById('v-note').innerHTML = `<strong>Historical Significance:</strong> ${data.note.replace('Historical Significance: ', '')}`;
+      document.getElementById('map-coords').textContent = data.coords;
+    }
+
+    document.querySelectorAll('.map-pin, .v-tab').forEach(el => {
+      el.addEventListener('click', () => {
+        const idx = parseInt(el.getAttribute('data-index'), 10);
+        selectVictim(idx);
+      });
+    });
+
+    // 2. Scroll Progress & Intersection Observer Reveals
+    const revealElements = document.querySelectorAll('.reveal');
+    const navLinks = document.querySelectorAll('.nav-links a');
+    const sections = document.querySelectorAll('section[id]');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.14 });
+
+    revealElements.forEach(el => observer.observe(el));
+
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      document.getElementById('progress-fill').style.width = `${progress}%`;
+
+      // Active Nav Highlight
+      let currentId = '';
+      sections.forEach(sec => {
+        const top = sec.offsetTop - 160;
+        if (scrollTop >= top) {
+          currentId = sec.getAttribute('id');
+        }
+      });
+
+      navLinks.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === `#${currentId}`);
+      });
+    });
+
+    // 3. Guided Animated Documentary Tour Mode
+    const tourBtn = document.getElementById('auto-tour-btn');
+    const playIcon = document.getElementById('play-icon');
+    const playLabel = document.getElementById('play-label');
+    let tourTimer = null;
+    let isTouring = false;
+
+    const tourSteps = [
+      () => document.getElementById('top').scrollIntoView({ behavior: 'smooth' }),
+      () => document.getElementById('origins').scrollIntoView({ behavior: 'smooth' }),
+      () => document.getElementById('identity').scrollIntoView({ behavior: 'smooth' }),
+      () => {
+        document.getElementById('victims').scrollIntoView({ behavior: 'smooth' });
+        selectVictim(0);
+      },
+      () => selectVictim(1),
+      () => selectVictim(2),
+      () => selectVictim(3),
+      () => selectVictim(4),
+      () => document.getElementById('ending').scrollIntoView({ behavior: 'smooth' })
+    ];
+
+    function stopTour() {
+      isTouring = false;
+      clearInterval(tourTimer);
+      tourBtn.classList.remove('playing');
+      playIcon.innerHTML = '&#9654;';
+      playLabel.textContent = 'Play Animated Tour';
+    }
+
+    tourBtn.addEventListener('click', () => {
+      if (isTouring) {
+        stopTour();
+        return;
+      }
+
+      isTouring = true;
+      tourBtn.classList.add('playing');
+      playIcon.innerHTML = '&#9632;';
+      playLabel.textContent = 'Stop Tour';
+
+      let step = 0;
+      tourSteps[step]();
+      step++;
+
+      tourTimer = setInterval(() => {
+        if (step >= tourSteps.length) {
+          stopTour();
+          return;
+        }
+        tourSteps[step]();
+        step++;
+      }, 3400);
+    });
+
+    // 4. Subtle Ambient London Fog & Lantern Dust Canvas
+    const canvas = document.getElementById('atmosphere-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const particleColors = [
+      'rgba(107, 74, 12, 0.35)',  // Warm gaslamp ochre
+      'rgba(6, 85, 89, 0.30)',    // Misty teal
+      'rgba(122, 0, 0, 0.25)',    // Crimson ember
+      'rgba(168, 173, 196, 0.18)' // Subtle mist
+    ];
+
+    for (let i = 0; i < 48; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 2.2 + 0.6,
+        vx: (Math.random() - 0.5) * 0.28,
+        vy: -Math.random() * 0.22 - 0.05,
+        color: particleColors[i % particleColors.length]
+      });
+    }
+
+    function animateAtmosphere() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.y < -10) p.y = canvas.height + 10;
+        if (p.x < -10) p.x = canvas.width + 10;
+        if (p.x > canvas.width + 10) p.x = -10;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+      }
+      requestAnimationFrame(animateAtmosphere);
+    }
+
+    animateAtmosphere();
+  </script>
+</body>
+</html>
