@@ -3,642 +3,1558 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>✦ My Disco Hub</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <title>BJ's CS Portfolio — Design Showcase</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts for all 4 Distinct Portfolio Aesthetics -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
   <style>
-    :root {
-      --bg-black: #050508;
-      --card-bg: rgba(16, 16, 24, 0.72);
-      --card-border: rgba(255, 255, 255, 0.09);
-      --text-main: #ffffff;
-      --text-muted: #9ca3b8;
-
-      /* Disco Palette */
-      --disco-pink: #ff2a85;
-      --disco-cyan: #00f5d4;
-      --disco-purple: #9b5de5;
-      --disco-gold: #fee440;
-      --disco-blue: #00bbf9;
-    }
-
+    /* ==========================================================================
+       BASE & SHOWCASE TRANSITION STYLES
+       ========================================================================== */
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
-      background-color: var(--bg-black);
-      color: var(--text-main);
-      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-      min-height: 100vh;
+      margin: 0;
+      padding: 0;
       overflow-x: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 4rem 1.25rem 5rem;
-      position: relative;
+      font-family: 'Inter', sans-serif;
     }
 
-    /* Ambient Disco Light Orbs */
-    .disco-ambient {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
+    @keyframes fadeSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
-    .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(100px);
-      opacity: 0.26;
-      animation: floatOrb 14s ease-in-out infinite alternate;
+    .sample-stage-enter {
+      animation: fadeSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    .orb-1 {
-      width: 340px;
-      height: 340px;
-      background: var(--disco-pink);
-      top: -80px;
-      left: 10%;
+    @keyframes cardPop {
+      from {
+        opacity: 0;
+        transform: scale(0.97) translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
     }
 
-    .orb-2 {
-      width: 380px;
-      height: 380px;
-      background: var(--disco-cyan);
-      bottom: -100px;
-      right: 8%;
-      animation-delay: -4s;
+    .card-animate {
+      animation: cardPop 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    .orb-3 {
-      width: 280px;
-      height: 280px;
-      background: var(--disco-purple);
-      top: 40%;
-      left: 55%;
-      animation-delay: -8s;
-    }
-
-    @keyframes floatOrb {
-      0% { transform: translate(0, 0) scale(1); }
-      100% { transform: translate(35px, -30px) scale(1.12); }
-    }
-
-    /* Subtle Sparkle Grid */
-    .sparkle-dots {
-      position: fixed;
-      inset: 0;
-      background-image: radial-gradient(rgba(255, 255, 255, 0.14) 1px, transparent 1px);
+    /* ==========================================================================
+       SAMPLE 1: CYBER TERMINAL STYLES
+       ========================================================================== */
+    .theme-cyber {
+      background-color: #090d16;
+      color: #e2e8f0;
+      font-family: 'Inter', sans-serif;
+      background-image:
+        linear-gradient(to right, rgba(34, 211, 238, 0.045) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(34, 211, 238, 0.045) 1px, transparent 1px);
       background-size: 36px 36px;
-      mask-image: radial-gradient(circle at center, black 35%, transparent 85%);
-      -webkit-mask-image: radial-gradient(circle at center, black 35%, transparent 85%);
-      pointer-events: none;
-      z-index: 0;
     }
 
-    /* Main Container */
-    .container {
-      width: 100%;
-      max-width: 760px;
+    .font-mono-code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    @keyframes cursorBlink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+
+    .terminal-cursor {
+      display: inline-block;
+      width: 10px;
+      height: 1.15em;
+      background-color: #10b981;
+      vertical-align: text-bottom;
+      margin-left: 4px;
+      animation: cursorBlink 1s infinite;
+    }
+
+    .cyber-card {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(34, 211, 238, 0.22);
+      transition: all 0.25s ease;
+    }
+
+    .cyber-card:hover {
+      border-color: #22d3ee;
+      box-shadow: 0 0 24px rgba(34, 211, 238, 0.16), inset 0 0 12px rgba(16, 185, 129, 0.06);
+      transform: translateY(-3px);
+    }
+
+    /* ==========================================================================
+       SAMPLE 2: MODERN BENTO STYLES
+       ========================================================================== */
+    .theme-bento {
+      background-color: #f8fafc;
+      color: #0f172a;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .bento-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 24px;
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.03);
+      transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .bento-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 32px -8px rgba(15, 23, 42, 0.1), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
+      border-color: #cbd5e1;
+    }
+
+    /* ==========================================================================
+       SAMPLE 3: SWISS BRUTALIST STYLES
+       ========================================================================== */
+    .theme-brutalist {
+      background-color: #f4f1ea;
+      color: #111111;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .brutalist-box {
+      background-color: #ffffff;
+      border: 2px solid #111111;
+      box-shadow: 5px 5px 0px #111111;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .brutalist-box:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 7px 7px 0px #111111;
+    }
+
+    .brutalist-btn {
+      border: 2px solid #111111;
+      box-shadow: 3px 3px 0px #111111;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease;
+    }
+
+    .brutalist-btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0px #111111;
+    }
+
+    .brutalist-btn:active,
+    .brutalist-btn-active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px #111111;
+    }
+
+    /* ==========================================================================
+       SAMPLE 4: COSMIC GLASS STYLES
+       ========================================================================== */
+    .theme-cosmic {
+      background-color: #070514;
+      color: #f8fafc;
+      font-family: 'Outfit', sans-serif;
       position: relative;
-      z-index: 1;
+      overflow-x: hidden;
     }
 
-    /* Header & Cute CSS Disco Ball */
-    header {
-      text-align: center;
-      margin-bottom: 3rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    @keyframes auroraFloatOne {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(35px, -25px) scale(1.08); }
     }
 
-    .disco-ball-wrap {
-      position: relative;
-      width: 78px;
-      height: 78px;
-      margin-bottom: 1.25rem;
-      display: grid;
-      place-items: center;
+    @keyframes auroraFloatTwo {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-30px, 30px) scale(1.1); }
     }
 
-    .disco-ball {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      background:
-        repeating-linear-gradient(
-          0deg,
-          rgba(255,255,255,0.22) 0px,
-          rgba(255,255,255,0.22) 2px,
-          transparent 2px,
-          transparent 8px
-        ),
-        repeating-linear-gradient(
-          90deg,
-          rgba(255,255,255,0.22) 0px,
-          rgba(255,255,255,0.22) 2px,
-          transparent 2px,
-          transparent 8px
-        ),
-        conic-gradient(
-          from 45deg,
-          var(--disco-pink),
-          var(--disco-purple),
-          var(--disco-cyan),
-          var(--disco-gold),
-          var(--disco-pink)
-        );
-      box-shadow:
-        inset -10px -10px 20px rgba(0, 0, 0, 0.65),
-        inset 6px 6px 14px rgba(255, 255, 255, 0.65),
-        0 0 28px rgba(255, 42, 133, 0.45),
-        0 0 50px rgba(0, 245, 212, 0.25);
-      animation: spinDisco 12s linear infinite;
+    .cosmic-orb-1 {
+      animation: auroraFloatOne 12s ease-in-out infinite;
     }
 
-    @keyframes spinDisco {
-      0% { filter: hue-rotate(0deg); transform: rotate(0deg); }
-      100% { filter: hue-rotate(360deg); transform: rotate(360deg); }
+    .cosmic-orb-2 {
+      animation: auroraFloatTwo 15s ease-in-out infinite;
     }
 
-    .star {
-      position: absolute;
-      color: #fff;
-      font-size: 0.9rem;
-      animation: twinkle 2.4s ease-in-out infinite;
-      text-shadow: 0 0 10px var(--disco-cyan);
-      user-select: none;
-    }
-
-    .star-1 { top: -2px; right: 2px; color: var(--disco-gold); }
-    .star-2 { bottom: 4px; left: 0px; font-size: 0.75rem; animation-delay: 0.8s; color: var(--disco-cyan); }
-    .star-3 { top: 12px; left: -6px; font-size: 0.65rem; animation-delay: 1.5s; color: var(--disco-pink); }
-
-    @keyframes twinkle {
-      0%, 100% { transform: scale(0.8) rotate(0deg); opacity: 0.5; }
-      50% { transform: scale(1.3) rotate(20deg); opacity: 1; }
-    }
-
-    h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(2rem, 5vw, 2.85rem);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      background: linear-gradient(90deg, #ffffff 0%, #ff85b8 35%, #72efdd 70%, #fee440 100%);
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: shimmerText 6s linear infinite;
-      margin-bottom: 0.5rem;
-    }
-
-    @keyframes shimmerText {
-      to { background-position: 200% center; }
-    }
-
-    .subtitle {
-      color: var(--text-muted);
-      font-size: 1.02rem;
-      max-width: 440px;
-      line-height: 1.5;
-    }
-
-    /* Sites Grid */
-    .sites-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-      gap: 1.15rem;
-    }
-
-    /* Site Card */
-    .site-card {
-      position: relative;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 1.15rem 1.25rem;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 22px;
-      text-decoration: none;
-      color: var(--text-main);
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.045);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      transition: transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
-                  border-color 0.3s ease,
-                  box-shadow 0.3s ease,
-                  background 0.3s ease;
-      overflow: hidden;
-    }
-
-    /* Iridescent Hover Glow */
-    .site-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: 22px;
-      padding: 1.5px;
-      background: linear-gradient(135deg, var(--disco-pink), var(--disco-purple), var(--disco-cyan), var(--disco-gold));
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      pointer-events: none;
-    }
-
-    .site-card:hover {
-      transform: translateY(-5px) scale(1.015);
-      background: rgba(24, 24, 36, 0.88);
-      box-shadow:
-        0 14px 32px -10px rgba(0, 0, 0, 0.8),
-        0 0 24px -4px rgba(255, 42, 133, 0.28),
-        0 0 24px -4px rgba(0, 245, 212, 0.22);
-    }
-
-    .site-card:hover::before {
-      opacity: 1;
-    }
-
-    .site-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 16px;
-      display: grid;
-      place-items: center;
-      font-size: 1.5rem;
-      flex-shrink: 0;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    .site-card:hover .site-icon {
-      transform: rotate(-6deg) scale(1.08);
-    }
-
-    .site-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .site-title-row {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 0.2rem;
-    }
-
-    .site-title {
-      font-weight: 600;
-      font-size: 1.06rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .site-tag {
-      font-size: 0.68rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      padding: 0.16rem 0.5rem;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--disco-cyan);
-      flex-shrink: 0;
-    }
-
-    .site-desc {
-      font-size: 0.86rem;
-      color: var(--text-muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .site-arrow {
-      color: var(--text-muted);
-      font-size: 1.15rem;
-      transition: transform 0.25s ease, color 0.25s ease;
-    }
-
-    .site-card:hover .site-arrow {
-      transform: translate(3px, -3px);
-      color: #ffffff;
-    }
-
-    /* Delete Button in Edit Mode */
-    .delete-btn {
-      display: none;
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      border: none;
-      background: rgba(255, 42, 133, 0.9);
-      color: white;
-      font-weight: 700;
-      cursor: pointer;
-      z-index: 3;
-      place-items: center;
-      font-size: 0.8rem;
-    }
-
-    body.edit-mode .delete-btn {
-      display: grid;
-    }
-
-    body.edit-mode .site-card {
-      animation: wiggle 0.4s ease-in-out infinite alternate;
-    }
-
-    @keyframes wiggle {
-      from { transform: rotate(-0.5deg); }
-      to { transform: rotate(0.5deg); }
-    }
-
-    /* Bottom Controls (Add / Edit / Export HTML) */
-    .controls-bar {
-      margin-top: 2.75rem;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.65rem;
-    }
-
-    .pill-btn {
-      background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      color: var(--text-muted);
-      font-family: inherit;
-      font-size: 0.84rem;
-      font-weight: 500;
-      padding: 0.55rem 1rem;
-      border-radius: 999px;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+      transition: all 0.28s ease;
     }
 
-    .pill-btn:hover {
-      color: #fff;
-      border-color: var(--disco-cyan);
-      background: rgba(0, 245, 212, 0.1);
-      transform: translateY(-2px);
+    .glass-panel:hover {
+      background: rgba(255, 255, 255, 0.075);
+      border-color: rgba(192, 132, 252, 0.45);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(124, 58, 237, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.22);
     }
 
-    .pill-btn.primary {
-      background: linear-gradient(135deg, rgba(255, 42, 133, 0.25), rgba(155, 93, 229, 0.25));
-      border-color: rgba(255, 42, 133, 0.45);
-      color: #fff;
+    /* Custom Scrollbar for Code Modal */
+    .code-scroll::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
     }
-
-    .pill-btn.primary:hover {
-      box-shadow: 0 0 20px rgba(255, 42, 133, 0.35);
+    .code-scroll::-webkit-scrollbar-track {
+      background: #0f172a;
     }
-
-    /* Modal for Adding a Site */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.78);
-      backdrop-filter: blur(8px);
-      display: none;
-      place-items: center;
-      padding: 1rem;
-      z-index: 50;
+    .code-scroll::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 9999px;
     }
-
-    .modal-backdrop.open {
-      display: grid;
-    }
-
-    .modal {
-      width: 100%;
-      max-width: 420px;
-      background: #0e0e16;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 24px;
-      padding: 1.75rem;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(155, 93, 229, 0.25);
-    }
-
-    .modal h2 {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.35rem;
-      margin-bottom: 1.15rem;
-    }
-
-    .field {
-      margin-bottom: 0.95rem;
-    }
-
-    .field label {
-      display: block;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-bottom: 0.35rem;
-    }
-
-    .field input {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 12px;
-      padding: 0.7rem 0.85rem;
-      color: #fff;
-      font-family: inherit;
-      font-size: 0.92rem;
-      outline: none;
-    }
-
-    .field input:focus {
-      border-color: var(--disco-cyan);
-    }
-
-    .field-row {
-      display: grid;
-      grid-template-columns: 90px 1fr;
-      gap: 0.75rem;
-    }
-
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.6rem;
-      margin-top: 1.35rem;
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 22px;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: #141422;
-      border: 1px solid var(--disco-cyan);
-      color: #fff;
-      padding: 0.6rem 1.15rem;
-      border-radius: 999px;
-      font-size: 0.85rem;
-      opacity: 0;
-      pointer-events: none;
-      transition: all 0.3s ease;
-      z-index: 60;
-      box-shadow: 0 0 20px rgba(0, 245, 212, 0.3);
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    footer {
-      margin-top: 2.5rem;
-      font-size: 0.8rem;
-      color: rgba(156, 163, 184, 0.55);
-      text-align: center;
+    .code-scroll::-webkit-scrollbar-thumb:hover {
+      background: #475569;
     }
   </style>
 </head>
-<body>
+<body class="antialiased selection:bg-cyan-500 selection:text-slate-950">
 
-  <!-- Ambient Disco Glow -->
-  <div class="disco-ambient">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-  </div>
-  <div class="sparkle-dots"></div>
+  <!-- ========================================================================
+       TOP SHOWCASE TOOLBAR (Unobtrusive switcher & code exporter)
+       ======================================================================== -->
+  <header
+    id="showcase-toolbar"
+    class="sticky top-0 z-50 w-full bg-slate-950/95 backdrop-blur-md border-b border-slate-800 text-slate-100 shadow-lg"
+  >
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2.5">
+      <!-- Label + 4 Sample Selector Tabs -->
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 mr-1 flex items-center gap-1.5">
+          <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          Choose a Portfolio Style:
+        </span>
 
-  <main class="container">
-    <!-- HEADER: Customize your title & bio here -->
-    <header>
-      <div class="disco-ball-wrap" aria-hidden="true">
-        <div class="disco-ball"></div>
-        <span class="star star-1">✦</span>
-        <span class="star star-2">✦</span>
-        <span class="star star-3">✧</span>
+        <nav aria-label="Portfolio Style Samples" class="flex flex-wrap items-center gap-1.5" id="sample-tabs">
+          <button
+            type="button"
+            data-sample="cyber"
+            class="sample-tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer bg-cyan-500 text-slate-950 font-semibold shadow-sm"
+          >
+            Sample 1: Cyber Terminal
+          </button>
+          <button
+            type="button"
+            data-sample="bento"
+            class="sample-tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-800"
+          >
+            Sample 2: Modern Bento
+          </button>
+          <button
+            type="button"
+            data-sample="brutalist"
+            class="sample-tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-800"
+          >
+            Sample 3: Swiss Brutalist
+          </button>
+          <button
+            type="button"
+            data-sample="cosmic"
+            class="sample-tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-800"
+          >
+            Sample 4: Cosmic Glass
+          </button>
+        </nav>
       </div>
-      <h1>my little corner</h1>
-      <p class="subtitle">A tiny disco directory of my favorite links, projects & shiny things on the internet.</p>
-    </header>
 
-    <!-- ============================================================
-         SITES GRID: Copy & paste any <a class="site-card"> block below
-         to hardcode new sites directly into your HTML!
-         ============================================================ -->
-    <section class="sites-grid" id="sitesGrid">
-
-      <a class="site-card" href="https://example.com" target="_blank" rel="noopener noreferrer">
-        <div class="site-icon">🪩</div>
-        <div class="site-info">
-          <div class="site-title-row">
-            <span class="site-title">My Portfolio</span>
-            <span class="site-tag">Main</span>
-          </div>
-          <p class="site-desc">Design, code & creative experiments</p>
-        </div>
-        <span class="site-arrow">↗</span>
-      </a>
-
-      <a class="site-card" href="https://example.com" target="_blank" rel="noopener noreferrer">
-        <div class="site-icon">✨</div>
-        <div class="site-info">
-          <div class="site-title-row">
-            <span class="site-title">Moodboard</span>
-            <span class="site-tag" style="color: #ff70a6;">Inspo</span>
-          </div>
-          <p class="site-desc">Visual bookmarks & late-night ideas</p>
-        </div>
-        <span class="site-arrow">↗</span>
-      </a>
-
-      <a class="site-card" href="https://example.com" target="_blank" rel="noopener noreferrer">
-        <div class="site-icon">🎧</div>
-        <div class="site-info">
-          <div class="site-title-row">
-            <span class="site-title">Disco Rotation</span>
-            <span class="site-tag" style="color: #fee440;">Music</span>
-          </div>
-          <p class="site-desc">Current playlists & favorite mixes</p>
-        </div>
-        <span class="site-arrow">↗</span>
-      </a>
-
-      <a class="site-card" href="https://example.com" target="_blank" rel="noopener noreferrer">
-        <div class="site-icon">🚀</div>
-        <div class="site-info">
-          <div class="site-title-row">
-            <span class="site-title">Coming Soon</span>
-            <span class="site-tag" style="color: #c77dff;">WIP</span>
-          </div>
-          <p class="site-desc">Next secret project loading...</p>
-        </div>
-        <span class="site-arrow">↗</span>
-      </a>
-
-    </section>
-
-    <!-- Optional Quick-Manage Bar -->
-    <div class="controls-bar">
-      <button class="pill-btn primary" id="openModalBtn">+ Add Site</button>
-      <button class="pill-btn" id="toggleEditBtn">✎ Edit</button>
-      <button class="pill-btn" id="copyHtmlBtn">⎘ Copy Updated HTML</button>
+      <!-- Copy Standalone HTML Action Button -->
+      <button
+        type="button"
+        id="open-code-modal-btn"
+        class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition-all shadow-sm flex items-center gap-1.5 cursor-pointer shrink-0"
+      >
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+        </svg>
+        Copy Standalone HTML
+      </button>
     </div>
+  </header>
 
-    <footer>made with stardust ✦</footer>
-  </main>
+  <!-- ========================================================================
+       LIVE PORTFOLIO PREVIEW STAGE
+       ======================================================================== -->
+  <main id="portfolio-stage" class="min-h-screen w-full transition-colors duration-300"></main>
 
-  <!-- Add Site Modal -->
-  <div class="modal-backdrop" id="modalBackdrop">
-    <div class="modal">
-      <h2>✦ Add a New Site</h2>
-      <form id="addSiteForm">
-        <div class="field-row">
-          <div class="field">
-            <label for="siteEmoji">Icon / Emoji</label>
-            <input type="text" id="siteEmoji" value="💖" maxlength="4" required />
-          </div>
-          <div class="field">
-            <label for="siteName">Site Name</label>
-            <input type="text" id="siteName" placeholder="e.g. My Blog" required />
-          </div>
+  <!-- ========================================================================
+       STANDALONE HTML CODE EXPORT MODAL
+       ======================================================================== -->
+  <div
+    id="code-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-title"
+    class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-6 bg-slate-950/80 backdrop-blur-sm"
+  >
+    <div
+      class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden text-slate-100"
+    >
+      <!-- Modal Header -->
+      <div class="px-5 py-4 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3 bg-slate-950/60">
+        <div>
+          <h2 id="modal-title" class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+            <span>Standalone HTML Code</span>
+            <span
+              id="modal-sample-badge"
+              class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30"
+            >
+              Sample 1: Cyber Terminal
+            </span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">
+            Complete single-file code without the top switcher bar. Save as <code class="text-emerald-400">index.html</code> next to <code class="text-emerald-400">root-sim1.html</code>.
+          </p>
         </div>
-        <div class="field">
-          <label for="siteUrl">URL</label>
-          <input type="url" id="siteUrl" placeholder="https://..." required />
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            id="copy-code-btn"
+            class="px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+          >
+            <svg id="copy-icon" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span id="copy-btn-text">Copy Code</span>
+          </button>
+
+          <button
+            type="button"
+            id="close-modal-btn"
+            aria-label="Close modal"
+            class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
-        <div class="field-row" style="grid-template-columns: 110px 1fr;">
-          <div class="field">
-            <label for="siteTag">Tag</label>
-            <input type="text" id="siteTag" placeholder="New" maxlength="12" />
-          </div>
-          <div class="field">
-            <label for="siteDesc">Short Description</label>
-            <input type="text" id="siteDesc" placeholder="What's this link about?" />
-          </div>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="pill-btn" id="closeModalBtn">Cancel</button>
-          <button type="submit" class="pill-btn primary">Save Site ✦</button>
-        </div>
-      </form>
+      </div>
+
+      <!-- Helpful Instruction Banner -->
+      <div class="px-5 py-2.5 bg-cyan-950/40 border-b border-cyan-900/50 text-xs text-cyan-200 flex items-center gap-2">
+        <svg class="w-4 h-4 text-cyan-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>
+          Look for the <strong class="text-white">HOW TO ADD A NEW PROJECT</strong> comments inside the code below whenever you build a new simulation, site, or game!
+        </span>
+      </div>
+
+      <!-- Code Output Area -->
+      <div class="p-4 flex-1 overflow-hidden flex flex-col bg-slate-950">
+        <textarea
+          id="standalone-code-output"
+          readonly
+          spellcheck="false"
+          class="w-full h-96 sm:h-[460px] bg-slate-950 text-emerald-300 font-mono-code text-xs leading-relaxed p-4 rounded-xl border border-slate-800 focus:outline-none focus:border-cyan-500 resize-none code-scroll"
+        ></textarea>
+      </div>
     </div>
   </div>
 
-  <div class="toast" id="toast">Copied!</div>
+  <!-- ========================================================================
+       APPLICATION LOGIC & 4 PORTFOLIO TEMPLATES
+       ======================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* ----------------------------------------------------------------------
+         SHARED PORTFOLIO PROJECT DATA
+         - Featured Real Project: Simulation #1 -> root-sim1.html
+         - 3 Clearly Marked Template Placeholders for Sites, Games, and Other
+         ---------------------------------------------------------------------- */
+      const PORTFOLIO_PROJECTS = [
+        {
+          id: 'sim-1',
+          number: '01',
+          title: 'Simulation #1',
+          category: 'Sims',
+          categoryLabel: 'Sims',
+          description: 'My first interactive computer science simulation.',
+          url: 'root-sim1.html',
+          isPlaceholder: false,
+          techTag: 'HTML5 / JS Simulation',
+          fileName: 'root-sim1.html'
+        },
+        {
+          id: 'site-1',
+          number: '02',
+          title: 'Web Project #1 (Placeholder)',
+          category: 'Sites',
+          categoryLabel: 'Sites',
+          description: 'Ready-to-customize template card for an upcoming responsive website or web application.',
+          url: '#',
+          isPlaceholder: true,
+          techTag: 'Web Development',
+          fileName: 'coming-soon.html'
+        },
+        {
+          id: 'game-1',
+          number: '03',
+          title: 'Game Project #1 (Placeholder)',
+          category: 'Games',
+          categoryLabel: 'Games',
+          description: 'Ready-to-customize template card for an upcoming interactive browser game or physics demo.',
+          url: '#',
+          isPlaceholder: true,
+          techTag: 'Interactive Game',
+          fileName: 'coming-soon.html'
+        },
+        {
+          id: 'other-1',
+          number: '04',
+          title: 'CS Experiment #1 (Placeholder)',
+          category: 'Other',
+          categoryLabel: 'Other',
+          description: 'Ready-to-customize template card for algorithms, data visualizations, or creative coding.',
+          url: '#',
+          isPlaceholder: true,
+          techTag: 'CS Lab / Experiment',
+          fileName: 'coming-soon.html'
+        }
+      ];
+
+      const CATEGORIES = [
+        { id: 'All', label: 'All' },
+        { id: 'Sims', label: 'Sims (Simulations)' },
+        { id: 'Sites', label: 'Sites (Websites)' },
+        { id: 'Games', label: 'Games' },
+        { id: 'Other', label: 'Other' }
+      ];
+
+      const SAMPLE_META = {
+        cyber: {
+          name: 'Sample 1: Cyber Terminal',
+          shortName: 'Cyber Terminal'
+        },
+        bento: {
+          name: 'Sample 2: Modern Bento',
+          shortName: 'Modern Bento'
+        },
+        brutalist: {
+          name: 'Sample 3: Swiss Brutalist',
+          shortName: 'Swiss Brutalist'
+        },
+        cosmic: {
+          name: 'Sample 4: Cosmic Glass',
+          shortName: 'Cosmic Glass'
+        }
+      };
+
+      /* Application State */
+      let activeSample = 'cyber';
+      let activeCategory = 'All';
+
+      /* DOM Elements */
+      const stageEl = document.getElementById('portfolio-stage');
+      const tabBtns = document.querySelectorAll('.sample-tab-btn');
+      const openModalBtn = document.getElementById('open-code-modal-btn');
+      const codeModal = document.getElementById('code-modal');
+      const closeModalBtn = document.getElementById('close-modal-btn');
+      const modalSampleBadge = document.getElementById('modal-sample-badge');
+      const codeOutput = document.getElementById('standalone-code-output');
+      const copyCodeBtn = document.getElementById('copy-code-btn');
+      const copyBtnText = document.getElementById('copy-btn-text');
+
+      /* ----------------------------------------------------------------------
+         SVG CATEGORY ICONS (Clean inline vector icons per category)
+         ---------------------------------------------------------------------- */
+      function getCategorySVG(category, className = 'w-6 h-6') {
+        switch (category) {
+          case 'Sims':
+            return `<svg class="${className}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
+            </svg>`;
+          case 'Sites':
+            return `<svg class="${className}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+            </svg>`;
+          case 'Games':
+            return `<svg class="${className}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14.25 6.087c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a.64.64 0 01-.657.643 48.39 48.39 0 01-4.163-.3c.186 1.613.293 3.25.315 4.907a.656.656 0 01-.658.663v0c-.355 0-.676-.186-.959-.401a1.647 1.647 0 00-1.003-.349c-1.036 0-1.875 1.007-1.875 2.25s.84 2.25 1.875 2.25c.369 0 .713-.128 1.003-.349.283-.215.604-.401.959-.401v0c.31 0 .555.26.532.57a48.039 48.039 0 01-.642 5.056c1.518.19 3.058.309 4.616.354a.64.64 0 00.657-.643v0c0-.355-.186-.676-.401-.959a1.647 1.647 0 01-.349-1.003c0-1.035 1.008-1.875 2.25-1.875 1.243 0 2.25.84 2.25 1.875 0 .369-.128.713-.349 1.003-.215.283-.4.604-.4.959v0c0 .333.277.599.61.58a48.1 48.1 0 005.427-.63 48.05 48.05 0 00.582-4.717.532.532 0 00-.533-.57v0c-.355 0-.676.186-.959.401-.29.221-.634.349-1.003.349-1.035 0-1.875-1.007-1.875-2.25s.84-2.25 1.875-2.25c.37 0 .713.128 1.003.349.283.215.604.401.96.401v0a.656.656 0 00.658-.663 48.422 48.422 0 00-.37-5.36c-1.886.342-3.81.574-5.766.689a.578.578 0 01-.61-.58v0z" />
+            </svg>`;
+          default:
+            return `<svg class="${className}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+            </svg>`;
+        }
+      }
+
+      /* ----------------------------------------------------------------------
+         SAMPLE 1 RENDERER: CYBER TERMINAL
+         ---------------------------------------------------------------------- */
+      function renderCyberSample(filteredProjects) {
+        const filterButtonsHTML = CATEGORIES.map((cat) => {
+          const isActive = activeCategory === cat.id;
+          return `
+            <button
+              type="button"
+              data-filter="${cat.id}"
+              class="filter-btn font-mono-code text-xs sm:text-sm px-4 py-2.5 rounded-lg border transition-all cursor-pointer ${
+                isActive
+                  ? 'bg-cyan-400/15 border-cyan-400 text-cyan-300 shadow-[0_0_16px_rgba(34,211,238,0.28)] font-semibold'
+                  : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:border-cyan-500/50 hover:text-cyan-200'
+              }"
+            >
+              <span class="text-emerald-400 mr-1">${isActive ? '>' : '$'}</span>${cat.label}
+            </button>
+          `;
+        }).join('');
+
+        const cardsHTML = filteredProjects
+          .map((proj) => {
+            return `
+              <article class="cyber-card rounded-xl p-6 flex flex-col justify-between card-animate relative overflow-hidden">
+                <div>
+                  <!-- Card Top Terminal Header -->
+                  <div class="flex items-center justify-between gap-2 pb-4 mb-4 border-b border-slate-800/90">
+                    <div class="flex items-center gap-2">
+                      <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
+                        ${getCategorySVG(proj.category, 'w-4 h-4')}
+                      </span>
+                      <span class="font-mono-code text-xs font-semibold px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
+                        ${proj.categoryLabel}
+                      </span>
+                    </div>
+
+                    ${
+                      proj.isPlaceholder
+                        ? `<span class="font-mono-code text-[11px] px-2.5 py-1 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30">
+                            Coming Soon — Template
+                          </span>`
+                        : `<span class="font-mono-code text-[11px] px-2.5 py-1 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-400/40 flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>Live Build
+                          </span>`
+                    }
+                  </div>
+
+                  <!-- Project Title & Description -->
+                  <div class="font-mono-code text-xs text-slate-500 mb-1.5">./${proj.fileName}</div>
+                  <h3 class="text-xl font-bold text-white mb-2 tracking-tight">${proj.title}</h3>
+                  <p class="text-slate-400 text-sm leading-relaxed mb-6">${proj.description}</p>
+                </div>
+
+                <!-- Action Link -->
+                <div class="pt-4 border-t border-slate-800/80 flex items-center justify-between gap-3">
+                  <span class="font-mono-code text-xs text-slate-500">${proj.techTag}</span>
+                  <a
+                    href="${proj.url}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="font-mono-code inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+                      proj.isPlaceholder
+                        ? 'bg-slate-800/90 text-slate-300 hover:bg-slate-700 border border-slate-700'
+                        : 'bg-cyan-400 text-slate-950 hover:bg-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.3)]'
+                    }"
+                  >
+                    <span>${proj.isPlaceholder ? 'Preview Slot' : 'Run Simulation'}</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                    </svg>
+                  </a>
+                </div>
+              </article>
+            `;
+          })
+          .join('');
+
+        return `
+          <div class="theme-cyber min-h-screen py-10 sm:py-16 px-4 sm:px-6 lg:px-8 sample-stage-enter">
+            <div class="max-w-6xl mx-auto">
+              <!-- Hero Terminal Window -->
+              <section class="rounded-2xl bg-slate-900/90 border border-cyan-500/30 shadow-[0_0_50px_rgba(34,211,238,0.08)] overflow-hidden mb-10">
+                <!-- Window Top Bar -->
+                <div class="px-4 py-3 bg-slate-950/90 border-b border-slate-800 flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-rose-500/80"></span>
+                    <span class="w-3 h-3 rounded-full bg-amber-400/80"></span>
+                    <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
+                    <span class="font-mono-code text-xs text-slate-400 ml-2">bj@cs-workstation: ~/bjs-cs-portfolio</span>
+                  </div>
+                  <span class="font-mono-code text-xs text-emerald-400 hidden sm:inline">UTF-8 // READY</span>
+                </div>
+
+                <!-- Hero Content -->
+                <div class="p-6 sm:p-10">
+                  <p class="font-mono-code text-xs sm:text-sm text-emerald-400 mb-3">
+                    ~/bjs-cs-portfolio $ <span class="text-cyan-300">cat welcome.txt</span><span class="terminal-cursor"></span>
+                  </p>
+                  <h1 class="text-3xl sm:text-5xl font-bold tracking-tight text-white mb-4">
+                    BJ's <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-emerald-400">CS Portfolio</span>
+                  </h1>
+                  <p class="text-slate-300 text-base sm:text-lg max-w-2xl leading-relaxed">
+                    Computer Science developer &amp; builder. Exploring interactive simulations, web engineering, game mechanics, and algorithmic experiments.
+                  </p>
+                </div>
+              </section>
+
+              <!-- Filter Controls -->
+              <section aria-label="Project Category Filters" class="mb-8">
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+                  <h2 class="font-mono-code text-xs uppercase tracking-widest text-cyan-400">
+                    // Filter Modules (${filteredProjects.length})
+                  </h2>
+                </div>
+                <div class="flex flex-wrap gap-2.5">
+                  ${filterButtonsHTML}
+                </div>
+              </section>
+
+              <!-- Projects Grid -->
+              <section aria-label="Portfolio Projects" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                ${cardsHTML}
+              </section>
+
+              <!-- Footer -->
+              <footer class="mt-16 pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono-code text-slate-500">
+                <span>&copy; ${new Date().getFullYear()} BJ's CS Portfolio // Built for Computer Science Exploration</span>
+                <span class="text-cyan-500/80">All project links open in a new tab</span>
+              </footer>
+            </div>
+          </div>
+        `;
+      }
+
+      /* ----------------------------------------------------------------------
+         SAMPLE 2 RENDERER: MODERN BENTO
+         ---------------------------------------------------------------------- */
+      function renderBentoSample(filteredProjects) {
+        const gradientMap = {
+          Sims: 'from-emerald-500 via-teal-500 to-cyan-600',
+          Sites: 'from-blue-600 via-indigo-600 to-violet-600',
+          Games: 'from-amber-500 via-orange-500 to-rose-500',
+          Other: 'from-purple-600 via-fuchsia-600 to-pink-600'
+        };
+
+        const filterButtonsHTML = CATEGORIES.map((cat) => {
+          const isActive = activeCategory === cat.id;
+          return `
+            <button
+              type="button"
+              data-filter="${cat.id}"
+              class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                isActive
+                  ? 'bg-slate-900 text-white shadow-md'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/70'
+              }"
+            >
+              ${cat.label}
+            </button>
+          `;
+        }).join('');
+
+        const cardsHTML = filteredProjects
+          .map((proj) => {
+            const grad = gradientMap[proj.category] || gradientMap.Other;
+            return `
+              <article class="bento-card overflow-hidden flex flex-col justify-between card-animate">
+                <div>
+                  <!-- Bento Gradient Visual Header -->
+                  <div class="h-36 bg-gradient-to-br ${grad} p-6 flex flex-col justify-between text-white relative overflow-hidden">
+                    <div class="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-white/15 blur-md"></div>
+                    <div class="flex items-center justify-between gap-2 relative z-10">
+                      <span class="px-3 py-1 rounded-full text-xs font-bold bg-white/20 backdrop-blur-md">
+                        ${proj.categoryLabel}
+                      </span>
+                      ${
+                        proj.isPlaceholder
+                          ? `<span class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-950/35 backdrop-blur-md">
+                              Coming Soon — Template
+                            </span>`
+                          : `<span class="px-3 py-1 rounded-full text-xs font-semibold bg-white text-slate-900 shadow-sm">
+                              Featured Project
+                            </span>`
+                      }
+                    </div>
+                    <div class="relative z-10 flex items-center gap-2.5">
+                      <div class="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center">
+                        ${getCategorySVG(proj.category, 'w-5 h-5 text-white')}
+                      </div>
+                      <span class="text-xs font-medium text-white/90">${proj.techTag}</span>
+                    </div>
+                  </div>
+
+                  <!-- Card Body -->
+                  <div class="p-6">
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">${proj.title}</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">${proj.description}</p>
+                  </div>
+                </div>
+
+                <!-- Card Footer -->
+                <div class="px-6 pb-6 pt-2 flex items-center justify-between">
+                  <span class="text-xs font-medium text-slate-400">${proj.fileName}</span>
+                  <a
+                    href="${proj.url}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-bold transition-all ${
+                      proj.isPlaceholder
+                        ? 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        : 'bg-slate-900 text-white hover:bg-slate-800 shadow-sm'
+                    }"
+                  >
+                    <span>${proj.isPlaceholder ? 'View Template' : 'Launch Project'}</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
+                    </svg>
+                  </a>
+                </div>
+              </article>
+            `;
+          })
+          .join('');
+
+        return `
+          <div class="theme-bento min-h-screen py-10 sm:py-16 px-4 sm:px-6 lg:px-8 sample-stage-enter">
+            <div class="max-w-6xl mx-auto">
+              <!-- Bento Top Grid Header -->
+              <section class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-10">
+                <div class="lg:col-span-2 bento-card p-8 sm:p-10 flex flex-col justify-between bg-white">
+                  <div>
+                    <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-600 mb-5">
+                      <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
+                      Computer Science Portfolio
+                    </span>
+                    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900 mb-4">
+                      BJ's CS Portfolio
+                    </h1>
+                    <p class="text-slate-600 text-base sm:text-lg max-w-xl leading-relaxed">
+                      A curated collection of interactive simulations, responsive websites, browser games, and computer science projects.
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Right Bento Accent Tile -->
+                <div class="rounded-3xl p-8 bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white flex flex-col justify-between shadow-lg">
+                  <div>
+                    <p class="text-xs font-bold uppercase tracking-wider text-indigo-300 mb-2">Focus Areas</p>
+                    <h2 class="text-2xl font-bold leading-snug">Code, Simulation &amp; Interactive Design</h2>
+                  </div>
+                  <div class="flex flex-wrap gap-2 mt-6">
+                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-white/10">Simulations</span>
+                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-white/10">Web Apps</span>
+                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-white/10">Games</span>
+                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-white/10">Algorithms</span>
+                  </div>
+                </div>
+              </section>
+
+              <!-- Segmented Pill Filter Bar -->
+              <section aria-label="Project Category Filters" class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="inline-flex flex-wrap items-center gap-1.5 p-1.5 rounded-2xl sm:rounded-full bg-slate-200/75 border border-slate-200/80">
+                  ${filterButtonsHTML}
+                </div>
+                <span class="text-xs font-semibold text-slate-500">
+                  Showing ${filteredProjects.length} ${filteredProjects.length === 1 ? 'project' : 'projects'}
+                </span>
+              </section>
+
+              <!-- Bento Project Cards Grid -->
+              <section aria-label="Portfolio Projects" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                ${cardsHTML}
+              </section>
+
+              <!-- Footer -->
+              <footer class="mt-16 pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-medium text-slate-500">
+                <span>&copy; ${new Date().getFullYear()} BJ's CS Portfolio</span>
+                <span>Every project link opens in a new browser tab</span>
+              </footer>
+            </div>
+          </div>
+        `;
+      }
+
+      /* ----------------------------------------------------------------------
+         SAMPLE 3 RENDERER: SWISS BRUTALIST
+         ---------------------------------------------------------------------- */
+      function renderBrutalistSample(filteredProjects) {
+        const badgeColorMap = {
+          Sims: 'bg-[#4ade80]',
+          Sites: 'bg-[#60a5fa]',
+          Games: 'bg-[#facc15]',
+          Other: 'bg-[#ff7b78]'
+        };
+
+        const filterButtonsHTML = CATEGORIES.map((cat) => {
+          const isActive = activeCategory === cat.id;
+          return `
+            <button
+              type="button"
+              data-filter="${cat.id}"
+              class="filter-btn brutalist-btn px-4 py-2.5 text-xs sm:text-sm font-bold uppercase tracking-wide cursor-pointer ${
+                isActive
+                  ? 'brutalist-btn-active bg-[#facc15] text-[#111111]'
+                  : 'bg-white text-[#111111] hover:bg-[#fef08a]'
+              }"
+            >
+              ${cat.label}
+            </button>
+          `;
+        }).join('');
+
+        const cardsHTML = filteredProjects
+          .map((proj) => {
+            const stampBg = badgeColorMap[proj.category] || 'bg-[#facc15]';
+            return `
+              <article class="brutalist-box p-6 flex flex-col justify-between card-animate">
+                <div>
+                  <!-- Top Number & Category Stamp Row -->
+                  <div class="flex items-center justify-between gap-2 pb-4 mb-5 border-b-2 border-[#111111]">
+                    <span class="font-mono-code text-2xl font-bold tracking-tighter text-[#111111]">
+                      #${proj.number}
+                    </span>
+                    <div class="flex flex-wrap items-center gap-2">
+                      <span class="font-mono-code text-xs font-bold uppercase px-3 py-1 border-2 border-[#111111] ${stampBg} text-[#111111]">
+                        ${proj.categoryLabel}
+                      </span>
+                      ${
+                        proj.isPlaceholder
+                          ? `<span class="font-mono-code text-xs font-bold uppercase px-2.5 py-1 border-2 border-[#111111] bg-[#f4f1ea] text-[#111111]">
+                              Coming Soon — Template
+                            </span>`
+                          : `<span class="font-mono-code text-xs font-bold uppercase px-2.5 py-1 border-2 border-[#111111] bg-[#111111] text-white">
+                              LIVE
+                            </span>`
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Title & Description -->
+                  <h3 class="text-2xl font-bold text-[#111111] mb-2.5 leading-tight">${proj.title}</h3>
+                  <p class="text-[#262626] text-sm sm:text-base leading-relaxed mb-6">${proj.description}</p>
+                </div>
+
+                <!-- Bottom Action Bar -->
+                <div class="pt-4 border-t-2 border-[#111111] flex items-center justify-between gap-3">
+                  <span class="font-mono-code text-xs font-bold uppercase text-[#525252]">${proj.fileName}</span>
+                  <a
+                    href="${proj.url}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="brutalist-btn inline-flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider ${
+                      proj.isPlaceholder
+                        ? 'bg-[#f4f1ea] text-[#111111] hover:bg-white'
+                        : 'bg-[#4ade80] text-[#111111] hover:bg-[#22c55e]'
+                    }"
+                  >
+                    <span>${proj.isPlaceholder ? 'TEMPLATE SLOT' : 'OPEN PROJECT'}</span>
+                    <span>&#8599;</span>
+                  </a>
+                </div>
+              </article>
+            `;
+          })
+          .join('');
+
+        return `
+          <div class="theme-brutalist min-h-screen py-10 sm:py-16 px-4 sm:px-6 lg:px-8 sample-stage-enter">
+            <div class="max-w-6xl mx-auto">
+              <!-- Swiss Editorial Hero Block -->
+              <section class="brutalist-box p-6 sm:p-10 mb-10 bg-white">
+                <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-6 border-b-2 border-[#111111]">
+                  <span class="font-mono-code text-xs font-bold uppercase px-3 py-1 bg-[#111111] text-white">
+                    INDEX // COMPUTER SCIENCE ARCHIVE
+                  </span>
+                  <span class="font-mono-code text-xs font-bold uppercase text-[#111111]">
+                    SIMS &bull; SITES &bull; GAMES &bull; LABS
+                  </span>
+                </div>
+
+                <h1 class="text-4xl sm:text-6xl font-bold tracking-tight text-[#111111] uppercase mb-4">
+                  BJ's CS Portfolio
+                </h1>
+                <p class="text-[#1f1f1f] text-base sm:text-lg max-w-2xl font-medium leading-relaxed">
+                  A structured catalog of computer science simulations, web builds, playable games, and interactive code experiments.
+                </p>
+              </section>
+
+              <!-- Tactile Filter Buttons -->
+              <section aria-label="Project Category Filters" class="mb-8">
+                <div class="flex flex-wrap items-center gap-3">
+                  ${filterButtonsHTML}
+                </div>
+              </section>
+
+              <!-- Brutalist Project Grid -->
+              <section aria-label="Portfolio Projects" class="grid grid-cols-1 md:grid-cols-2 gap-7">
+                ${cardsHTML}
+              </section>
+
+              <!-- Footer -->
+              <footer class="mt-16 pt-6 border-t-2 border-[#111111] flex flex-col sm:flex-row items-center justify-between gap-3 font-mono-code text-xs font-bold uppercase text-[#111111]">
+                <span>&copy; ${new Date().getFullYear()} BJ's CS PORTFOLIO</span>
+                <span>ALL LINKS OPEN IN A NEW TAB &#8599;</span>
+              </footer>
+            </div>
+          </div>
+        `;
+      }
+
+      /* ----------------------------------------------------------------------
+         SAMPLE 4 RENDERER: COSMIC GLASS
+         ---------------------------------------------------------------------- */
+      function renderCosmicSample(filteredProjects) {
+        const filterButtonsHTML = CATEGORIES.map((cat) => {
+          const isActive = activeCategory === cat.id;
+          return `
+            <button
+              type="button"
+              data-filter="${cat.id}"
+              class="filter-btn px-4 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer backdrop-blur-md ${
+                isActive
+                  ? 'bg-gradient-to-r from-violet-500/80 via-fuchsia-500/80 to-cyan-500/80 text-white border border-white/40 shadow-[0_0_24px_rgba(168,85,247,0.45)]'
+                  : 'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10 hover:text-white'
+              }"
+            >
+              ${cat.label}
+            </button>
+          `;
+        }).join('');
+
+        const cardsHTML = filteredProjects
+          .map((proj) => {
+            return `
+              <article class="glass-panel rounded-3xl p-6 sm:p-7 flex flex-col justify-between card-animate">
+                <div>
+                  <!-- Top Row -->
+                  <div class="flex items-center justify-between gap-2 mb-5">
+                    <div class="flex items-center gap-2.5">
+                      <span class="w-10 h-10 rounded-2xl bg-gradient-to-br from-violet-500/30 to-cyan-500/30 border border-white/15 flex items-center justify-center text-cyan-300">
+                        ${getCategorySVG(proj.category, 'w-5 h-5')}
+                      </span>
+                      <span class="px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-fuchsia-200 border border-white/10">
+                        ${proj.categoryLabel}
+                      </span>
+                    </div>
+
+                    ${
+                      proj.isPlaceholder
+                        ? `<span class="px-3 py-1 rounded-full text-xs font-medium bg-white/5 text-slate-300 border border-white/10">
+                            Coming Soon — Template
+                          </span>`
+                        : `<span class="px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-cyan-400/20 to-violet-400/20 text-cyan-200 border border-cyan-400/30">
+                            Featured Sim
+                          </span>`
+                    }
+                  </div>
+
+                  <!-- Title & Description -->
+                  <h3 class="text-xl sm:text-2xl font-bold text-white mb-2.5">${proj.title}</h3>
+                  <p class="text-slate-300/90 text-sm leading-relaxed mb-6">${proj.description}</p>
+                </div>
+
+                <!-- Card Footer -->
+                <div class="pt-4 border-t border-white/10 flex items-center justify-between gap-3">
+                  <span class="text-xs text-slate-400">${proj.techTag}</span>
+                  <a
+                    href="${proj.url}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all ${
+                      proj.isPlaceholder
+                        ? 'bg-white/10 text-white hover:bg-white/20 border border-white/15'
+                        : 'bg-gradient-to-r from-violet-500 to-cyan-500 text-white hover:opacity-95 shadow-[0_0_20px_rgba(139,92,246,0.4)]'
+                    }"
+                  >
+                    <span>${proj.isPlaceholder ? 'Preview Template' : 'Explore Project'}</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                    </svg>
+                  </a>
+                </div>
+              </article>
+            `;
+          })
+          .join('');
+
+        return `
+          <div class="theme-cosmic min-h-screen py-12 sm:py-16 px-4 sm:px-6 lg:px-8 sample-stage-enter">
+            <!-- Ambient Radial Aurora Orbs -->
+            <div aria-hidden="true" class="pointer-events-none fixed inset-0 overflow-hidden z-0">
+              <div class="cosmic-orb-1 absolute -top-24 -left-24 w-96 h-96 rounded-full bg-violet-600/25 blur-[110px]"></div>
+              <div class="cosmic-orb-2 absolute top-1/3 -right-24 w-[28rem] h-[28rem] rounded-full bg-cyan-500/20 blur-[120px]"></div>
+              <div class="cosmic-orb-1 absolute -bottom-24 left-1/3 w-96 h-96 rounded-full bg-fuchsia-600/20 blur-[110px]"></div>
+            </div>
+
+            <div class="max-w-6xl mx-auto relative z-10">
+              <!-- Hero Glass Spotlight -->
+              <section class="glass-panel rounded-3xl p-8 sm:p-12 text-center mb-10">
+                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-white/10 text-cyan-200 border border-white/15 mb-5">
+                  <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                  Computer Science &amp; Creative Engineering
+                </span>
+                <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white via-fuchsia-200 to-cyan-200">
+                  BJ's CS Portfolio
+                </h1>
+                <p class="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+                  Showcasing interactive simulations, modern web experiences, custom games, and computer science experiments.
+                </p>
+              </section>
+
+              <!-- Frosted Filter Pills -->
+              <section aria-label="Project Category Filters" class="mb-9 flex flex-wrap items-center justify-center gap-2.5">
+                ${filterButtonsHTML}
+              </section>
+
+              <!-- Glass Project Cards -->
+              <section aria-label="Portfolio Projects" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                ${cardsHTML}
+              </section>
+
+              <!-- Footer -->
+              <footer class="mt-16 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+                <span>&copy; ${new Date().getFullYear()} BJ's CS Portfolio</span>
+                <span>All links open safely in a new tab</span>
+              </footer>
+            </div>
+          </div>
+        `;
+      }
+
+      /* ----------------------------------------------------------------------
+         RENDER CONTROLLER
+         ---------------------------------------------------------------------- */
+      function renderActiveSample() {
+        const filteredProjects =
+          activeCategory === 'All'
+            ? PORTFOLIO_PROJECTS
+            : PORTFOLIO_PROJECTS.filter((p) => p.category === activeCategory);
+
+        let html = '';
+        if (activeSample === 'cyber') {
+          html = renderCyberSample(filteredProjects);
+        } else if (activeSample === 'bento') {
+          html = renderBentoSample(filteredProjects);
+        } else if (activeSample === 'brutalist') {
+          html = renderBrutalistSample(filteredProjects);
+        } else {
+          html = renderCosmicSample(filteredProjects);
+        }
+
+        stageEl.innerHTML = html;
+
+        /* Attach filter button listeners inside the active sample */
+        const filterBtns = stageEl.querySelectorAll('.filter-btn');
+        filterBtns.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            activeCategory = btn.getAttribute('data-filter');
+            renderActiveSample();
+          });
+        });
+      }
+
+      function updateToolbarTabs() {
+        tabBtns.forEach((btn) => {
+          const sampleKey = btn.getAttribute('data-sample');
+          if (sampleKey === activeSample) {
+            btn.className =
+              'sample-tab-btn px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer bg-cyan-500 text-slate-950 font-semibold shadow-sm';
+          } else {
+            btn.className =
+              'sample-tab-btn px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-800';
+          }
+        });
+      }
+
+      tabBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const nextSample = btn.getAttribute('data-sample');
+          if (nextSample && nextSample !== activeSample) {
+            activeSample = nextSample;
+            updateToolbarTabs();
+            renderActiveSample();
+          }
+        });
+      });
+
+      /* ----------------------------------------------------------------------
+         STANDALONE HTML CODE GENERATOR (Clean, Toolbar-Free, Commented)
+         ---------------------------------------------------------------------- */
+      function generateStandaloneHTML(sampleKey) {
+        const meta = SAMPLE_META[sampleKey];
+
+        const themeConfig = {
+          cyber: {
+            fonts:
+              'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap',
+            customCSS: `
+    body {
+      background-color: #090d16;
+      color: #e2e8f0;
+      font-family: 'Inter', sans-serif;
+      background-image:
+        linear-gradient(to right, rgba(34, 211, 238, 0.045) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(34, 211, 238, 0.045) 1px, transparent 1px);
+      background-size: 36px 36px;
+    }
+    .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+    .project-card {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(34, 211, 238, 0.22);
+      transition: all 0.25s ease;
+    }
+    .project-card:hover {
+      border-color: #22d3ee;
+      box-shadow: 0 0 24px rgba(34, 211, 238, 0.16);
+      transform: translateY(-3px);
+    }`,
+            headerHTML: `
+    <header class="rounded-2xl bg-slate-900/90 border border-cyan-500/30 shadow-xl overflow-hidden mb-10">
+      <div class="px-4 py-3 bg-slate-950/90 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-rose-500/80"></span>
+          <span class="w-3 h-3 rounded-full bg-amber-400/80"></span>
+          <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
+          <span class="font-mono-code text-xs text-slate-400 ml-2">bj@cs-workstation: ~/bjs-cs-portfolio</span>
+        </div>
+        <span class="font-mono-code text-xs text-emerald-400">ONLINE</span>
+      </div>
+      <div class="p-6 sm:p-10">
+        <p class="font-mono-code text-xs sm:text-sm text-emerald-400 mb-3">~/bjs-cs-portfolio $ <span class="text-cyan-300">./portfolio --launch</span></p>
+        <h1 class="text-3xl sm:text-5xl font-bold tracking-tight text-white mb-4">
+          BJ's <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-emerald-400">CS Portfolio</span>
+        </h1>
+        <p class="text-slate-300 text-base sm:text-lg max-w-2xl leading-relaxed">
+          Computer Science developer &amp; builder. Exploring interactive simulations, web engineering, game mechanics, and algorithmic experiments.
+        </p>
+      </div>
+    </header>`,
+            activeFilterClass:
+              'bg-cyan-400/15 border-cyan-400 text-cyan-300 shadow-[0_0_16px_rgba(34,211,238,0.28)] font-semibold',
+            inactiveFilterClass:
+              'bg-slate-900/80 border-slate-800 text-slate-400 hover:border-cyan-500/50 hover:text-cyan-200',
+            filterBaseClass: 'font-mono-code text-xs sm:text-sm px-4 py-2.5 rounded-lg border transition-all cursor-pointer',
+            renderCardJS: `
+        return \`
+          <article class="project-card rounded-xl p-6 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-2 pb-4 mb-4 border-b border-slate-800">
+                <span class="font-mono-code text-xs font-semibold px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
+                  \${project.category}
+                </span>
+                \${project.isPlaceholder
+                  ? '<span class="font-mono-code text-[11px] px-2.5 py-1 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30">Coming Soon — Template</span>'
+                  : '<span class="font-mono-code text-[11px] px-2.5 py-1 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-400/40">Live Build</span>'}
+              </div>
+              <h3 class="text-xl font-bold text-white mb-2">\${project.title}</h3>
+              <p class="text-slate-400 text-sm leading-relaxed mb-6">\${project.description}</p>
+            </div>
+            <div class="pt-4 border-t border-slate-800 flex items-center justify-between">
+              <span class="font-mono-code text-xs text-slate-500">\${project.url}</span>
+              <a href="\${project.url}" target="_blank" rel="noopener noreferrer"
+                 class="font-mono-code inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all \${project.isPlaceholder ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' : 'bg-cyan-400 text-slate-950 hover:bg-cyan-300'}">
+                \${project.isPlaceholder ? 'Preview Slot ↗' : 'Run Simulation ↗'}
+              </a>
+            </div>
+          </article>
+        \`;`
+          },
+
+          bento: {
+            fonts:
+              'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap',
+            customCSS: `
+    body {
+      background-color: #f8fafc;
+      color: #0f172a;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .bento-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 24px;
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+      transition: all 0.25s ease;
+    }
+    .bento-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 32px -8px rgba(15, 23, 42, 0.12);
+    }`,
+            headerHTML: `
+    <header class="bento-card p-8 sm:p-10 mb-10">
+      <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-600 mb-4">
+        Computer Science Portfolio
+      </span>
+      <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900 mb-4">BJ's CS Portfolio</h1>
+      <p class="text-slate-600 text-base sm:text-lg max-w-2xl leading-relaxed">
+        A curated collection of interactive simulations, responsive websites, browser games, and computer science projects.
+      </p>
+    </header>`,
+            activeFilterClass: 'bg-slate-900 text-white shadow-md',
+            inactiveFilterClass: 'bg-white text-slate-600 border border-slate-200 hover:text-slate-900',
+            filterBaseClass: 'px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer',
+            renderCardJS: `
+        const gradients = {
+          Sims: 'from-emerald-500 to-cyan-600',
+          Sites: 'from-blue-600 to-violet-600',
+          Games: 'from-amber-500 to-rose-500',
+          Other: 'from-purple-600 to-pink-600'
+        };
+        const grad = gradients[project.category] || gradients.Other;
+        return \`
+          <article class="bento-card overflow-hidden flex flex-col justify-between">
+            <div>
+              <div class="h-32 bg-gradient-to-br \${grad} p-6 flex items-start justify-between text-white">
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-white/20 backdrop-blur-md">\${project.category}</span>
+                \${project.isPlaceholder
+                  ? '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-950/35">Coming Soon — Template</span>'
+                  : '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-white text-slate-900">Featured Project</span>'}
+              </div>
+              <div class="p-6">
+                <h3 class="text-xl font-bold text-slate-900 mb-2">\${project.title}</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">\${project.description}</p>
+              </div>
+            </div>
+            <div class="px-6 pb-6 pt-2 flex items-center justify-between">
+              <span class="text-xs font-medium text-slate-400">\${project.url}</span>
+              <a href="\${project.url}" target="_blank" rel="noopener noreferrer"
+                 class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-bold transition-all \${project.isPlaceholder ? 'bg-slate-100 text-slate-700 hover:bg-slate-200' : 'bg-slate-900 text-white hover:bg-slate-800'}">
+                \${project.isPlaceholder ? 'View Template ↗' : 'Launch Project ↗'}
+              </a>
+            </div>
+          </article>
+        \`;`
+          },
+
+          brutalist: {
+            fonts:
+              'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;700&family=Space+Grotesk:wght@500;600;700&display=swap',
+            customCSS: `
+    body {
+      background-color: #f4f1ea;
+      color: #111111;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+    .brutalist-box {
+      background-color: #ffffff;
+      border: 2px solid #111111;
+      box-shadow: 5px 5px 0px #111111;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .brutalist-box:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 7px 7px 0px #111111;
+    }
+    .brutalist-btn {
+      border: 2px solid #111111;
+      box-shadow: 3px 3px 0px #111111;
+      transition: all 0.12s ease;
+    }`,
+            headerHTML: `
+    <header class="brutalist-box p-6 sm:p-10 mb-10 bg-white">
+      <div class="pb-4 mb-6 border-b-2 border-[#111111] flex items-center justify-between">
+        <span class="font-mono-code text-xs font-bold uppercase px-3 py-1 bg-[#111111] text-white">COMPUTER SCIENCE ARCHIVE</span>
+        <span class="font-mono-code text-xs font-bold">SIMS // SITES // GAMES // OTHER</span>
+      </div>
+      <h1 class="text-4xl sm:text-6xl font-bold tracking-tight text-[#111111] uppercase mb-4">BJ's CS Portfolio</h1>
+      <p class="text-[#1f1f1f] text-base sm:text-lg max-w-2xl font-medium leading-relaxed">
+        A structured catalog of computer science simulations, web builds, playable games, and interactive code experiments.
+      </p>
+    </header>`,
+            activeFilterClass: 'bg-[#facc15] text-[#111111]',
+            inactiveFilterClass: 'bg-white text-[#111111] hover:bg-[#fef08a]',
+            filterBaseClass: 'brutalist-btn px-4 py-2.5 text-xs sm:text-sm font-bold uppercase tracking-wide cursor-pointer',
+            renderCardJS: `
+        return \`
+          <article class="brutalist-box p-6 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-2 pb-4 mb-5 border-b-2 border-[#111111]">
+                <span class="font-mono-code text-xs font-bold uppercase px-3 py-1 border-2 border-[#111111] bg-[#4ade80]">\${project.category}</span>
+                \${project.isPlaceholder
+                  ? '<span class="font-mono-code text-xs font-bold uppercase px-2.5 py-1 border-2 border-[#111111] bg-[#f4f1ea]">Coming Soon — Template</span>'
+                  : '<span class="font-mono-code text-xs font-bold uppercase px-2.5 py-1 border-2 border-[#111111] bg-[#111111] text-white">LIVE</span>'}
+              </div>
+              <h3 class="text-2xl font-bold text-[#111111] mb-2.5">\${project.title}</h3>
+              <p class="text-[#262626] text-sm sm:text-base leading-relaxed mb-6">\${project.description}</p>
+            </div>
+            <div class="pt-4 border-t-2 border-[#111111] flex items-center justify-between">
+              <span class="font-mono-code text-xs font-bold uppercase text-[#525252]">\${project.url}</span>
+              <a href="\${project.url}" target="_blank" rel="noopener noreferrer"
+                 class="brutalist-btn inline-flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider \${project.isPlaceholder ? 'bg-[#f4f1ea]' : 'bg-[#4ade80] hover:bg-[#22c55e]'}">
+                \${project.isPlaceholder ? 'TEMPLATE SLOT ↗' : 'OPEN PROJECT ↗'}
+              </a>
+            </div>
+          </article>
+        \`;`
+          },
+
+          cosmic: {
+            fonts:
+              'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap',
+            customCSS: `
+    body {
+      background-color: #070514;
+      color: #f8fafc;
+      font-family: 'Outfit', sans-serif;
+    }
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: all 0.25s ease;
+    }
+    .glass-panel:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(192, 132, 252, 0.45);
+      transform: translateY(-4px);
+    }`,
+            headerHTML: `
+    <header class="glass-panel rounded-3xl p-8 sm:p-12 text-center mb-10">
+      <span class="inline-block px-4 py-1.5 rounded-full text-xs font-semibold bg-white/10 text-cyan-200 border border-white/15 mb-4">
+        Computer Science &amp; Creative Engineering
+      </span>
+      <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white via-fuchsia-200 to-cyan-200">
+        BJ's CS Portfolio
+      </h1>
+      <p class="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+        Showcasing interactive simulations, modern web experiences, custom games, and computer science experiments.
+      </p>
+    </header>`,
+            activeFilterClass:
+              'bg-gradient-to-r from-violet-500 to-cyan-500 text-white border border-white/30 shadow-lg',
+            inactiveFilterClass:
+              'bg-white/5 text-slate-300 border border-white/10 hover:bg-white/10 hover:text-white',
+            filterBaseClass: 'px-4 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer',
+            renderCardJS: `
+        return \`
+          <article class="glass-panel rounded-3xl p-6 sm:p-7 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-5">
+                <span class="px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-fuchsia-200 border border-white/10">\${project.category}</span>
+                \${project.isPlaceholder
+                  ? '<span class="px-3 py-1 rounded-full text-xs font-medium bg-white/5 text-slate-300 border border-white/10">Coming Soon — Template</span>'
+                  : '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-cyan-400/20 text-cyan-200 border border-cyan-400/30">Featured Sim</span>'}
+              </div>
+              <h3 class="text-xl sm:text-2xl font-bold text-white mb-2.5">\${project.title}</h3>
+              <p class="text-slate-300 text-sm leading-relaxed mb-6">\${project.description}</p>
+            </div>
+            <div class="pt-4 border-t border-white/10 flex items-center justify-between">
+              <span class="text-xs text-slate-400">\${project.url}</span>
+              <a href="\${project.url}" target="_blank" rel="noopener noreferrer"
+                 class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all \${project.isPlaceholder ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-gradient-to-r from-violet-500 to-cyan-500 text-white'}">
+                \${project.isPlaceholder ? 'Preview Template ↗' : 'Explore Project ↗'}
+              </a>
+            </div>
+          </article>
+        \`;`
+          }
+        };
+
+        const cfg = themeConfig[sampleKey];
+
+        return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BJ's CS Portfolio (${meta.shortName})</title>
+  <script src="https://cdn.tailwindcss.com"><\/script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="${cfg.fonts}" rel="stylesheet" />
+  <style>${cfg.customCSS}
+  </style>
+</head>
+<body class="min-h-screen py-10 sm:py-16 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-6xl mx-auto">
+    <!-- PORTFOLIO HEADER -->
+${cfg.headerHTML}
+
+    <!-- CATEGORY FILTER BUTTONS -->
+    <nav aria-label="Project Categories" id="filter-bar" class="flex flex-wrap gap-2.5 mb-8">
+      <button type="button" data-category="All" class="filter-btn ${cfg.filterBaseClass} ${cfg.activeFilterClass}">All</button>
+      <button type="button" data-category="Sims" class="filter-btn ${cfg.filterBaseClass} ${cfg.inactiveFilterClass}">Sims (Simulations)</button>
+      <button type="button" data-category="Sites" class="filter-btn ${cfg.filterBaseClass} ${cfg.inactiveFilterClass}">Sites (Websites)</button>
+      <button type="button" data-category="Games" class="filter-btn ${cfg.filterBaseClass} ${cfg.inactiveFilterClass}">Games</button>
+      <button type="button" data-category="Other" class="filter-btn ${cfg.filterBaseClass} ${cfg.inactiveFilterClass}">Other</button>
+    </nav>
+
+    <!-- PROJECT CARDS GRID -->
+    <main id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></main>
+
+    <!-- FOOTER -->
+    <footer class="mt-16 pt-6 border-t border-current/10 text-xs opacity-70 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <span>&copy; ${new Date().getFullYear()} BJ's CS Portfolio</span>
+      <span>All project links open in a new tab</span>
+    </footer>
+  </div>
 
   <script>
-    const STORAGE_KEY = 'disco_
+    /* =========================================================================
+       HOW TO ADD A NEW PROJECT TO BJ'S CS PORTFOLIO:
+       1. Copy any object inside the PROJECTS array below.
+       2. Paste it as a new item in the array (make sure items are separated by a comma).
+       3. Set:
+          - title: "Your Project Name"
+          - category: "Sims", "Sites", "Games", or "Other"
+          - description: "Short summary of what your project does"
+          - url: "your-project-file.html" (or full https:// link)
+          - isPlaceholder: false
+       4. Every project link automatically opens in a new tab!
+       ========================================================================= */
+    const PROJECTS = [
+      {
+        title: "Simulation #1",
+        category: "Sims",
+        description: "My first interactive computer science simulation.",
+        url: "root-sim1.html",
+        isPlaceholder: false
+      },
+      /* --- TEMPLATE PLACEHOLDERS BELOW (Replace these as you build more projects!) --- */
+      {
+        title: "Web Project #1 (Placeholder)",
+        category: "Sites",
+        description: "Ready-to-customize template card for an upcoming responsive website or web application.",
+        url: "#",
+        isPlaceholder: true
+      },
+      {
+        title: "Game Project #1 (Placeholder)",
+        category: "Games",
+        description: "Ready-to-customize template card for an upcoming interactive browser game or physics demo.",
+        url: "#",
+        isPlaceholder: true
+      },
+      {
+        title: "CS Experiment #1 (Placeholder)",
+        category: "Other",
+        description: "Ready-to-customize template card for algorithms, data visualizations, or creative coding.",
+        url: "#",
+        isPlaceholder: true
+      }
+    ];
+
+    const ACTIVE_CLASS = "${cfg.activeFilterClass}";
+    const INACTIVE_CLASS = "${cfg.inactiveFilterClass}";
+    const BASE_CLASS = "filter-btn ${cfg.filterBaseClass}";
+
+    let currentCategory = "All";
+
+    function renderProjects() {
+      const grid = document.getElementById("projects-grid");
+      const filtered = currentCategory === "All"
+        ? PROJECTS
+        : PROJECTS.filter((p) => p.category === currentCategory);
+
+      grid.innerHTML = filtered.map((project) => {${cfg.renderCardJS}
+      }).join("");
+    }
+
+    document.querySelectorAll(".filter-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        currentCategory = btn.getAttribute("data-category");
+        document.querySelectorAll(".filter-btn").forEach((b) => {
+          const isMatch = b.getAttribute("data-category") === currentCategory;
+          b.className = BASE_CLASS + " " + (isMatch ? ACTIVE_CLASS : INACTIVE_CLASS);
+        });
+        renderProjects();
+      });
+    });
+
+    // Initial render
+    renderProjects();
+  <\/script>
+</body>
+</html>`;
+      }
+
+      /* ----------------------------------------------------------------------
+         MODAL & CLIPBOARD INTERACTIONS (iFrame-Safe Copy)
+         ---------------------------------------------------------------------- */
+      function openCodeModal() {
+        const meta = SAMPLE_META[activeSample];
+        modalSampleBadge.textContent = meta.name;
+        codeOutput.value = generateStandaloneHTML(activeSample);
+        copyBtnText.textContent = 'Copy Code';
+        codeModal.classList.remove('hidden');
+        codeModal.classList.add('flex');
+      }
+
+      function closeCodeModal() {
+        codeModal.classList.add('hidden');
+        codeModal.classList.remove('flex');
+      }
+
+      function copyStandaloneCode() {
+        codeOutput.focus();
+        codeOutput.select();
+        codeOutput.setSelectionRange(0, codeOutput.value.length);
+
+        let copied = false;
+        try {
+          copied = document.execCommand('copy');
+        } catch (err) {
+          copied = false;
+        }
+
+        if (copied) {
+          copyBtnText.textContent = 'Copied to Clipboard!';
+          copyCodeBtn.classList.remove('bg-emerald-500', 'hover:bg-emerald-400');
+          copyCodeBtn.classList.add('bg-cyan-400');
+          setTimeout(() => {
+            copyBtnText.textContent = 'Copy Code';
+            copyCodeBtn.classList.remove('bg-cyan-400');
+            copyCodeBtn.classList.add('bg-emerald-500', 'hover:bg-emerald-400');
+          }, 2200);
+        } else if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(codeOutput.value).then(() => {
+            copyBtnText.textContent = 'Copied to Clipboard!';
+            setTimeout(() => {
+              copyBtnText.textContent = 'Copy Code';
+            }, 2200);
+          });
+        }
+      }
+
+      openModalBtn.addEventListener('click', openCodeModal);
+      closeModalBtn.addEventListener('click', closeCodeModal);
+      copyCodeBtn.addEventListener('click', copyStandaloneCode);
+
+      codeModal.addEventListener('click', (e) => {
+        if (e.target === codeModal) {
+          closeCodeModal();
+        }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !codeModal.classList.contains('hidden')) {
+          closeCodeModal();
+        }
+      });
+
+      /* Initial Render */
+      renderActiveSample();
+    })();
+  </script>
+</body>
+</html>
