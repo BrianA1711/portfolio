@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Sugar Rush — Top-Down Arena Game</title>
+  <!-- Tailwind CSS for clean, modern, minimal responsive layout -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Font: Inter for crisp modern legibility -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* Base typography and touch behavior */
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #ffffff;
+      color: #0a0a0c;
+      overflow-x: hidden;
+      touch-action: manipulation;
+    }
+
+    /* Smooth animations for UI overlays and urgent timer pulse */
+    @keyframes popIn {
+      0% { transform: scale(0.94); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .animate-pop {
+      animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes pulseUrgent {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+    }
+
+    .timer-urgent {
+      animation: pulseUrgent 0.65s infinite ease-in-out;
+    }
+
+    /* Canvas styling: crisp square presentation with tactile elevation */
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 1.25rem;
+      touch-action: none;
+      cursor: grab;
+    }
+
+    #gameCanvas:active {
+      cursor: grabbing;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-white text-[#0a0a0c] flex flex-col items-center justify-between p-3 sm:p-5 select-none">
+
+  <!-- Top Minimal Header & HUD -->
+  <header class="w-full max-w-3xl flex flex-col gap-2.5">
+    <div class="flex items-center justify-between gap-2">
+      <!-- Brand Title -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-[#0a0a0c] flex items-center justify-center shadow-sm">
+          <span class="w-4 h-4 rounded-full bg-[#ec4899] ring-2 ring-[#facc15]"></span>
+        </div>
+        <div>
+          <h1 class="text-lg sm:text-xl font-black tracking-tight leading-none text-[#0a0a0c]">SUGAR RUSH</h1>
+          <p class="text-[11px] font-semibold uppercase tracking-widest text-[#0a0a0c]/60 mt-0.5">Top-Down Arena</p>
+        </div>
+      </div>
+
+      <!-- 30-Second Timer Pill -->
+      <div id="timerBox" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl border-2 border-[#0a0a0c] bg-white shadow-[2px_2px_0px_#0a0a0c] transition-colors">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#16a34a]" id="timerDot"></span>
+        <span class="text-xs font-bold uppercase tracking-wider text-[#0a0a0c]/70">Time</span>
+        <span id="timerDisplay" class="text-base sm:text-lg font-black tabular-nums text-[#0a0a0c]">00:30</span>
+      </div>
+    </div>
+
+    <!-- Stats Strip: Round, Total Score, Round Goal Progress -->
+    <div class="grid grid-cols-3 gap-2 sm:gap-3">
+      <!-- Round Card -->
+      <div class="rounded-xl border-2 border-[#0a0a0c] bg-white px-3 py-2 shadow-[2px_2px_0px_#0a0a0c] flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#0a0a0c]/60">Round</span>
+          <span id="difficultyBadge" class="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-[#facc15] text-[#0a0a0c]">LVL 1</span>
+        </div>
+        <div id="roundDisplay" class="text-lg sm:text-2xl font-black tabular-nums leading-tight mt-0.5">1</div>
+      </div>
+
+      <!-- Total Score Card (Starts at 0, persists across rounds) -->
+      <div class="rounded-xl border-2 border-[#0a0a0c] bg-white px-3 py-2 shadow-[2px_2px_0px_#0a0a0c] flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#0a0a0c]/60">Total Score</span>
+          <span id="comboBadge" class="hidden text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-[#ec4899] text-white">x2</span>
+        </div>
+        <div id="scoreDisplay" class="text-lg sm:text-2xl font-black tabular-nums leading-tight mt-0.5">0</div>
+      </div>
+
+      <!-- Round Requirement Progress Card -->
+      <div class="rounded-xl border-2 border-[#0a0a0c] bg-white px-3 py-2 shadow-[2px_2px_0px_#0a0a0c] flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#0a0a0c]/60">Round Goal</span>
+          <span id="goalFraction" class="text-[11px] sm:text-xs font-extrabold tabular-nums text-[#2563eb]">0 / 50</span>
+        </div>
+        <div class="w-full h-3 rounded-full bg-[#0a0a0c]/10 overflow-hidden mt-1.5 border border-[#0a0a0c]">
+          <div id="goalProgressBar" class="h-full bg-[#16a34a] transition-all duration-200" style="width: 0%;"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Center Square Top-Down Arena Wrapper -->
+  <main class="flex-1 w-full max-w-3xl flex items-center justify-center my-2 sm:my-3">
+    <div id="arenaContainer" class="relative aspect-square w-full max-w-[min(88vw,64vh)] sm:max-w-[min(82vw,66vh)] rounded-[1.35rem] border-[3px] border-[#0a0a0c] shadow-[6px_6px_0px_#0a0a0c] bg-white overflow-hidden">
+      <!-- Main HTML5 Game Canvas -->
+      <canvas id="gameCanvas"></canvas>
+
+      <!-- Start / Title Screen Overlay -->
+      <div id="startOverlay" class="absolute inset-0 bg-white/95 backdrop-blur-xs flex flex-col items-center justify-center p-5 sm:p-8 text-center z-20 animate-pop">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="w-4 h-4 rounded-full bg-[#ef4444] border-2 border-[#0a0a0c]"></span>
+          <span class="w-4 h-4 rounded-full bg-[#facc15] border-2 border-[#0a0a0c]"></span>
+          <span class="w-4 h-4 rounded-full bg-[#16a34a] border-2 border-[#0a0a0c]"></span>
+          <span class="w-4 h-4 rounded-full bg-[#2563eb] border-2 border-[#0a0a0c]"></span>
+          <span class="w-4 h-4 rounded-full bg-[#ec4899] border-2 border-[#0a0a0c]"></span>
+        </div>
+        <h2 class="text-3xl sm:text-4xl font-black tracking-tight text-[#0a0a0c]">SUGAR RUSH</h2>
+        <p class="text-xs sm:text-sm font-medium text-[#0a0a0c]/75 max-w-sm mt-2 leading-relaxed">
+          Drag identical candies together inside the bush-bordered arena to score points before the <strong class="text-[#0a0a0c]">30-second (00:30)</strong> timer runs out.
+        </p>
+
+        <!-- Rules Summary Box -->
+        <div class="w-full max-w-sm mt-4 p-3.5 rounded-2xl border-2 border-[#0a0a0c] bg-white text-left space-y-2 shadow-[3px_3px_0px_#0a0a0c]">
+          <div class="flex items-center justify-between text-xs sm:text-sm">
+            <span class="font-semibold text-[#0a0a0c]/70">Controls</span>
+            <span class="font-bold text-[#0a0a0c]">Cursor / Touch Drag Pairs</span>
+          </div>
+          <div class="flex items-center justify-between text-xs sm:text-sm">
+            <span class="font-semibold text-[#0a0a0c]/70">Round 1 Goal</span>
+            <span class="font-bold text-[#16a34a]">50 Points (+25 each round)</span>
+          </div>
+          <div class="flex items-center justify-between text-xs sm:text-sm">
+            <span class="font-semibold text-[#0a0a0c]/70">Round Timer</span>
+            <span class="font-bold text-[#2563eb]">30 Seconds (00:30)</span>
+          </div>
+        </div>
+
+        <button id="startBtn" class="mt-5 px-8 py-3.5 rounded-xl bg-[#16a34a] hover:bg-[#15803d] active:translate-y-0.5 text-white font-black text-sm sm:text-base tracking-wide border-2 border-[#0a0a0c] shadow-[4px_4px_0px_#0a0a0c] transition-all cursor-pointer">
+          PLAY ROUND 1
+        </button>
+      </div>
+
+      <!-- Round Complete Overlay -->
+      <div id="roundClearOverlay" class="hidden absolute inset-0 bg-white/95 backdrop-blur-xs flex flex-col items-center justify-center p-5 sm:p-8 text-center z-20 animate-pop">
+        <span class="px-3 py-1 rounded-full bg-[#facc15] border-2 border-[#0a0a0c] text-xs font-black uppercase tracking-wider text-[#0a0a0c]">
+          Round Cleared!
+        </span>
+        <h2 id="roundClearTitle" class="text-2xl sm:text-4xl font-black tracking-tight text-[#0a0a0c] mt-3">
+          ROUND 1 COMPLETE
+        </h2>
+        <p id="roundClearDesc" class="text-xs sm:text-sm font-medium text-[#0a0a0c]/75 max-w-sm mt-2">
+          Your score carries forward! Next round adds new candy varieties, faster movement, and a higher point goal.
+        </p>
+
+        <div class="w-full max-w-xs mt-4 p-3.5 rounded-2xl border-2 border-[#0a0a0c] bg-white space-y-2 shadow-[3px_3px_0px_#0a0a0c]">
+          <div class="flex justify-between text-xs sm:text-sm">
+            <span class="font-semibold text-[#0a0a0c]/70">Current Score</span>
+            <span id="clearScoreVal" class="font-black text-[#0a0a0c]">50</span>
+          </div>
+          <div class="flex justify-between text-xs sm:text-sm">
+            <span class="font-semibold text-[#0a0a0c]/70">Time Bonus</span>
+            <span id="clearBonusVal" class="font-black text-[#16a34a]">+10</span>
+          </div>
+          <div class="border-t border-[#0a0a0c]/15 pt-2 flex justify-between text-xs sm:text-sm">
+            <span class="font-semibold text-[#0a0a0c]/70">Next Round Goal</span>
+            <span id="nextGoalVal" class="font-black text-[#2563eb]">75 pts</span>
+          </div>
+        </div>
+
+        <button id="nextRoundBtn" class="mt-5 px-8 py-3.5 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] active:translate-y-0.5 text-white font-black text-sm sm:text-base tracking-wide border-2 border-[#0a0a0c] shadow-[4px_4px_0px_#0a0a0c] transition-all cursor-pointer">
+          START ROUND 2
+        </button>
+      </div>
+
+      <!-- Game Over Overlay -->
+      <div id="gameOverOverlay" class="hidden absolute inset-0 bg-white/95 backdrop-blur-xs flex flex-col items-center justify-center p-5 sm:p-8 text-center z-20 animate-pop">
+        <span class="px-3 py-1 rounded-full bg-[#ef4444] border-2 border-[#0a0a0c] text-xs font-black uppercase tracking-wider text-white">
+          Time's Up!
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-black tracking-tight text-[#0a0a0c] mt-3">
+          GAME OVER
+        </h2>
+        <p id="gameOverReason" class="text-xs sm:text-sm font-medium text-[#0a0a0c]/75 max-w-sm mt-2">
+          The 30-second timer ran out before reaching the round requirement.
+        </p>
+
+        <div class="w-full max-w-xs mt-4 p-3.5 rounded-2xl border-2 border-[#0a0a0c] bg-white space-y-2 shadow-[3px_3px_0px_#0a0a0c]">
+          <div class="flex justify-between text-xs sm:text-sm">
+            <span class="font-semibold text-[#0a0a0c]/70">Final Score</span>
+            <span id="finalScoreVal" class="font-black text-[#0a0a0c]">0</span>
+          </div>
+          <div class="flex justify-between text-xs sm:text-sm">
+            <span class="font-semibold text-[#0a0a0c]/70">Round Reached</span>
+            <span id="finalRoundVal" class="font-black text-[#ec4899]">Round 1</span>
+          </div>
+          <div class="flex justify-between text-xs sm:text-sm">
+            <span class="font-semibold text-[#0a0a0c]/70">Pairs Matched</span>
+            <span id="finalPairsVal" class="font-black text-[#16a34a]">0</span>
+          </div>
+        </div>
+
+        <button id="restartBtn" class="mt-5 px-8 py-3.5 rounded-xl bg-[#ec4899] hover:bg-[#db2777] active:translate-y-0.5 text-white font-black text-sm sm:text-base tracking-wide border-2 border-[#0a0a0c] shadow-[4px_4px_0px_#0a0a0c] transition-all cursor-pointer">
+          PLAY AGAIN
+        </button>
+      </div>
+
+      <!-- Pause Overlay -->
+      <div id="pauseOverlay" class="hidden absolute inset-0 bg-white/90 backdrop-blur-xs flex flex-col items-center justify-center p-6 text-center z-20 animate-pop">
+        <h2 class="text-2xl sm:text-3xl font-black tracking-tight text-[#0a0a0c]">GAME PAUSED</h2>
+        <p class="text-xs sm:text-sm font-medium text-[#0a0a0c]/70 mt-1">Take a breather — your 30s timer is stopped.</p>
+        <button id="resumeBtn" class="mt-5 px-7 py-3 rounded-xl bg-[#facc15] hover:bg-[#eab308] text-[#0a0a0c] font-black text-sm border-2 border-[#0a0a0c] shadow-[4px_4px_0px_#0a0a0c] transition-all cursor-pointer">
+          RESUME GAME
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Minimal Action Controls -->
+  <footer class="w-full max-w-3xl flex items-center justify-between gap-2">
+    <p id="statusHint" class="text-xs font-semibold text-[#0a0a0c]/70 truncate">
+      Drag matching candies together within 30 seconds!
+    </p>
+
+    <div class="flex items-center gap-2 shrink-0">
+      <button id="soundToggleBtn" class="px-3 py-2 rounded-xl border-2 border-[#0a0a0c] bg-white hover:bg-[#facc15]/30 text-xs font-bold text-[#0a0a0c] shadow-[2px_2px_0px_#0a0a0c] transition-all cursor-pointer" aria-label="Toggle Sound">
+        Sound: ON
+      </button>
+      <button id="pauseBtn" class="px-3 py-2 rounded-xl border-2 border-[#0a0a0c] bg-white hover:bg-[#2563eb]/15 text-xs font-bold text-[#0a0a0c] shadow-[2px_2px_0px_#0a0a0c] transition-all cursor-pointer">
+        Pause
+      </button>
+      <button id="resetQuickBtn" class="px-3 py-2 rounded-xl border-2 border-[#0a0a0c] bg-white hover:bg-[#ef4444]/15 text-xs font-bold text-[#0a0a0c] shadow-[2px_2px_0px_#0a0a0c] transition-all cursor-pointer">
+        Reset
+      </button>
+    </div>
+  </footer>
+
+  <script>
+    /**
+     * SUGAR RUSH — Top-Down Arena Candy Pairing Game
+     * -------------------------------------------------------------------------
+     * Strict Color Palette: Yellow, Blue, Green, Black, White, Pink, and Red.
+     * Rules:
+     *  - Large square background bordered on all 4 sides by bush barriers.
+     *  - Total score always starts at 0 and carries forward across rounds.
+     *  - Round 1 requires 50 points; each beaten round increases requirement by +25.
+     *  - Round timer starts at 30 seconds (00:30) each round.
+     *  - Difficulty scales each round with more candy varieties, faster drift,
+     *    and periodic swirl shuffles.
+     */
+
+    (() => {
+      // =========================================================================
+      // 1. CONSTANTS & STRICT PALETTE DEFINITION
+      // =========================================================================
+      const PALETTE = {
+        yellow: '#facc15',
+        yellowDark: '#eab308',
+        blue: '#2563eb',
+        blueLight: '#60a5fa',
+        green: '#16a34a',
+        greenLight: '#22c55e',
+        greenDark: '#15803d',
+        black: '#0a0a0c',
+        white: '#ffffff',
+        pink: '#ec4899',
+        pinkLight: '#f472b6',
+        red: '#ef4444',
+        redDark: '#dc2626'
+      };
+
+      const ARENA_LOGICAL_SIZE = 800; // Logical square coordinate space (800 x 800)
+      const BUSH_MARGIN = 66;         // Width of bush barriers on all 4 sides
+      const PLAY_MIN = BUSH_MARGIN;
+      const PLAY_MAX = ARENA_LOGICAL_SIZE - BUSH_MARGIN;
+      const CANDY_RADIUS = 25;        // Base radius of each candy piece
+      const ROUND_TIME_SECONDS = 30;  // 30 seconds per round
+      const TIMER_SPEED_MULTIPLIER = 1.75; // Accelerates the 30-second countdown pace
+      const BASE_GOAL = 50;           // Starting required points in Round 1
+      const GOAL_STEP = 25;           // +25 points required per beaten round
+      const BASE_PAIR_POINTS = 10;    // Points earned per matched pair
+
+      // Distinct Candy Varieties using strictly Yellow, Blue, Green, Black, White, Pink, Red
+      const CANDY_TYPES = [
+        { id: 'red_berry',    name: 'Red Berry',     primary: PALETTE.red,    secondary: PALETTE.white,  accent: PALETTE.pink,   shape: 'berry' },
+        { id: 'yellow_star',  name: 'Lemon Star',    primary: PALETTE.yellow, secondary: PALETTE.white,  accent: PALETTE.red,    shape: 'star' },
+        { id: 'blue_mint',    name: 'Blue Mint',     primary: PALETTE.blue,   secondary: PALETTE.white,  accent: PALETTE.blueLight, shape: 'swirl' },
+        { id: 'pink_heart',   name: 'Pink Heart',    primary: PALETTE.pink,   secondary: PALETTE.white,  accent: PALETTE.red,    shape: 'heart' },
+        { id: 'green_ring',   name: 'Apple Ring',    primary: PALETTE.green,  secondary: PALETTE.white,  accent: PALETTE.yellow, shape: 'ring' },
+        { id: 'licorice',     name: 'Licorice Gem',  primary: PALETTE.black,  secondary: PALETTE.white,  accent: PALETTE.pink,   shape: 'diamond' },
+        { id: 'bonbon',       name: 'Citrus Bonbon', primary: PALETTE.red,    secondary: PALETTE.yellow, accent: PALETTE.white,  shape: 'bonbon' }
+      ];
+
+      // =========================================================================
+      // 2. DOM ELEMENTS & CANVAS SETUP
+      // =========================================================================
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+      const arenaContainer = document.getElementById('arenaContainer');
+
+      // HUD Elements
+      const timerBox = document.getElementById('timerBox');
+      const timerDot = document.getElementById('timerDot');
+      const timerDisplay = document.getElementById('timerDisplay');
+      const roundDisplay = document.getElementById('roundDisplay');
+      const difficultyBadge = document.getElementById('difficultyBadge');
+      const scoreDisplay = document.getElementById('scoreDisplay');
+      const comboBadge = document.getElementById('comboBadge');
+      const goalFraction = document.getElementById('goalFraction');
+      const goalProgressBar = document.getElementById('goalProgressBar');
+      const statusHint = document.getElementById('statusHint');
+
+      // Overlays & Buttons
+      const startOverlay = document.getElementById('startOverlay');
+      const roundClearOverlay = document.getElementById('roundClearOverlay');
+      const gameOverOverlay = document.getElementById('gameOverOverlay');
+      const pauseOverlay = document.getElementById('pauseOverlay');
+
+      const startBtn = document.getElementById('startBtn');
+      const nextRoundBtn = document.getElementById('nextRoundBtn');
+      const restartBtn = document.getElementById('restartBtn');
+      const pauseBtn = document.getElementById('pauseBtn');
+      const resumeBtn = document.getElementById('resumeBtn');
+      const resetQuickBtn = document.getElementById('resetQuickBtn');
+      const soundToggleBtn = document.getElementById('soundToggleBtn');
+
+      // Overlay Detail Elements
+      const roundClearTitle = document.getElementById('roundClearTitle');
+      const clearScoreVal = document.getElementById('clearScoreVal');
+      const clearBonusVal = document.getElementById('clearBonusVal');
+      const nextGoalVal = document.getElementById('nextGoalVal');
+      const finalScoreVal = document.getElementById('finalScoreVal');
+      const finalRoundVal = document.getElementById('finalRoundVal');
+      const finalPairsVal = document.getElementById('finalPairsVal');
+
+      // =========================================================================
+      // 3. WEB AUDIO SYNTHESIZER (NO EXTERNAL URLS)
+      // =========================================================================
+      const AudioFX = (() => {
+        let audioCtx = null;
+        let enabled = true;
+
+        function ensureContext() {
+          if (!enabled) return null;
+          if (!audioCtx) {
+            const Ctx = window.AudioContext || window.webkitAudioContext;
+            if (Ctx) audioCtx = new Ctx();
+          }
+          if (audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume().catch(() => {});
+          }
+          return audioCtx;
+        }
+
+        function playTone(freq, type, duration, gainVal, delay = 0) {
+          const ac = ensureContext();
+          if (!ac) return;
+          try {
+            const osc = ac.createOscillator();
+            const gain = ac.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, ac.currentTime + delay);
+
+            gain.gain.setValueAtTime(0.001, ac.currentTime + delay);
+            gain.gain.exponentialRampToValueAtTime(gainVal, ac.currentTime + delay + 0.015);
+            gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + delay + duration);
+
+            osc.connect(gain);
+            gain.connect(ac.destination);
+            osc.start(ac.currentTime + delay);
+            osc.stop(ac.currentTime + delay + duration + 0.02);
+          } catch (_) {
+            // Ignore audio errors on restricted environments
+          }
+        }
+
+        return {
+          get enabled() { return enabled; },
+          toggle() {
+            enabled = !enabled;
+            return enabled;
+          },
+          pickup() {
+            playTone(440, 'sine', 0.08, 0.08);
+          },
+          match(combo = 1) {
+            const base = 523.25 * Math.pow(1.06, Math.min(combo - 1, 8));
+            playTone(base, 'triangle', 0.14, 0.13, 0);
+            playTone(base * 1.25, 'sine', 0.18, 0.13, 0.06);
+          },
+          bushBump() {
+            playTone(140, 'sine', 0.07, 0.05);
+          },
+          roundClear() {
+            [523.25, 659.25, 783.99, 1046.5].forEach((f, idx) => {
+              playTone(f, 'triangle', 0.22, 0.13, idx * 0.08);
+            });
+          },
+          gameOver() {
+            [392.0, 349.23, 311.13, 261.63].forEach((f, idx) => {
+              playTone(f, 'sawtooth', 0.24, 0.08, idx * 0.11);
+            });
+          }
+        };
+      })();
+
+      // =========================================================================
+      // 4. GAME STATE & BUSH BARRIER GENERATION
+      // =========================================================================
+      const state = {
+        mode: 'START', // 'START' | 'PLAYING' | 'PAUSED' | 'ROUND_CLEAR' | 'GAME_OVER'
+        round: 1,
+        totalScore: 0,      // Starts at 0 and persists across rounds
+        roundScore: 0,      // Points earned within current round
+        roundGoal: BASE_GOAL,
+        timeLeft: ROUND_TIME_SECONDS, // Always starts at 30 seconds per round
+        pairsMatchedTotal: 0,
+        combo: 0,
+        comboTimer: 0,
+        swirlTimer: 0,
+        swirlPulse: 0,
+        candies: [],
+        particles: [],
+        floatingTexts: [],
+        bushes: [],
+        draggedCandyId: null,
+        pointerPos: { x: 400, y: 400 },
+        dragOffset: { x: 0, y: 0 },
+        lastTimestamp: 0,
+        nextEntityId: 1
+      };
+
+      /**
+       * Generates decorative & interactive bush clusters lining all four sides
+       * of the square arena so the playfield is clearly framed by bush barriers.
+       */
+      function generateBushes() {
+        const bushes = [];
+        const step = 44;
+        const berryColors = [PALETTE.red, PALETTE.pink, PALETTE.yellow, PALETTE.blue];
+        let idx = 0;
+
+        // Top and bottom bush borders
+        for (let x = 22; x <= ARENA_LOGICAL_SIZE - 22; x += step) {
+          bushes.push(createBushNode(x, 30, 34 + (idx % 3) * 4, berryColors[idx % berryColors.length]));
+          bushes.push(createBushNode(x, ARENA_LOGICAL_SIZE - 30, 34 + ((idx + 1) % 3) * 4, berryColors[(idx + 2) % berryColors.length]));
+          idx++;
+        }
+
+        // Left and right bush borders
+        for (let y = 66; y <= ARENA_LOGICAL_SIZE - 66; y += step) {
+          bushes.push(createBushNode(30, y, 34 + (idx % 3) * 4, berryColors[(idx + 1) % berryColors.length]));
+          bushes.push(createBushNode(ARENA_LOGICAL_SIZE - 30, y, 34 + ((idx + 2) % 3) * 4, berryColors[(idx + 3) % berryColors.length]));
+          idx++;
+        }
+
+        state.bushes = bushes;
+      }
+
+      function createBushNode(x, y, radius, berryColor) {
+        return {
+          x,
+          y,
+          radius,
+          berryColor,
+          shake: 0,
+          berries: [
+            { dx: -radius * 0.32, dy: -radius * 0.22 },
+            { dx: radius * 0.28, dy: radius * 0.24 },
+            { dx: radius * 0.12, dy: -radius * 0.34 }
+          ]
+        };
+      }
+
+      // =========================================================================
+      // 5. ROUND & CANDY SPAWN LOGIC
+      // =========================================================================
+      function getRoundConfig(round) {
+        const unlockedTypes = Math.min(4 + Math.floor((round - 1) / 1), CANDY_TYPES.length);
+        const pairCount = Math.min(6 + Math.floor((round - 1) * 1.2), 11);
+        const driftSpeed = Math.min(26 + (round - 1) * 14, 125);
+        const swirlInterval = round >= 2 ? Math.max(9 - (round - 2) * 1.2, 4.5) : 0;
+
+        return {
+          goal: BASE_GOAL + (round - 1) * GOAL_STEP,
+          unlockedTypes,
+          pairCount,
+          driftSpeed,
+          swirlInterval
+        };
+      }
+
+      function findSafeSpawnPosition(existingCandies, marginPad = 36) {
+        const minCoord = PLAY_MIN + marginPad;
+        const maxCoord = PLAY_MAX - marginPad;
+
+        for (let attempt = 0; attempt < 60; attempt++) {
+          const x = minCoord + Math.random() * (maxCoord - minCoord);
+          const y = minCoord + Math.random() * (maxCoord - minCoord);
+          let clear = true;
+
+          for (const c of existingCandies) {
+            const dist = Math.hypot(c.x - x, c.y - y);
+            if (dist < CANDY_RADIUS * 2.25) {
+              clear = false;
+              break;
+            }
+          }
+          if (clear) return { x, y };
+        }
+
+        return {
+          x: minCoord + Math.random() * (maxCoord - minCoord),
+          y: minCoord + Math.random() * (maxCoord - minCoord)
+        };
+      }
+
+      function spawnCandyPair(typeIndex, driftSpeed) {
+        const type = CANDY_TYPES[typeIndex % CANDY_TYPES.length];
+        for (let i = 0; i < 2; i++) {
+          const pos = findSafeSpawnPosition(state.candies);
+          const angle = Math.random() * Math.PI * 2;
+          const speed = driftSpeed * (0.65 + Math.random() * 0.7);
+          state.candies.push({
+            id: state.nextEntityId++,
+            typeId: type.id,
+            type,
+            x: pos.x,
+            y: pos.y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            r: CANDY_RADIUS,
+            scale: 0.1, // Animates smoothly to 1.0 on spawn
+            wobble: Math.random() * Math.PI * 2
+          });
+        }
+      }
+
+      function setupRound(roundNumber, preserveTotalScore = true) {
+        const cfg = getRoundConfig(roundNumber);
+        state.round = roundNumber;
+        if (!preserveTotalScore) {
+          state.totalScore = 0;
+          state.pairsMatchedTotal = 0;
+        }
+        state.roundScore = 0;
+        state.roundGoal = cfg.goal;
+        state.timeLeft = ROUND_TIME_SECONDS; // Reset timer to 30 seconds
+        state.combo = 0;
+        state.comboTimer = 0;
+        state.swirlTimer = cfg.swirlInterval;
+        state.swirlPulse = 0;
+        state.draggedCandyId = null;
+        state.candies = [];
+        state.particles = [];
+        state.floatingTexts = [];
+
+        // Populate guaranteed matching pairs
+        for (let p = 0; p < cfg.pairCount; p++) {
+          const typeIdx = p % cfg.unlockedTypes;
+          spawnCandyPair(typeIdx, cfg.driftSpeed);
+        }
+
+        updateHUD();
+      }
+
+      // =========================================================================
+      // 6. HUD & UI STATE SYNCHRONIZATION
+      // =========================================================================
+      function formatTime(seconds) {
+        const clamped = Math.max(0, Math.ceil(seconds));
+        const mins = Math.floor(clamped / 60);
+        const secs = clamped % 60;
+        return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      }
+
+      function updateHUD() {
+        timerDisplay.textContent = formatTime(state.timeLeft);
+        roundDisplay.textContent = String(state.round);
+        difficultyBadge.textContent = `LVL ${state.round}`;
+        scoreDisplay.textContent = String(state.totalScore);
+        goalFraction.textContent = `${state.roundScore} / ${state.roundGoal}`;
+
+        const pct = Math.min(100, Math.round((state.roundScore / state.roundGoal) * 100));
+        goalProgressBar.style.width = `${pct}%`;
+
+        // Combo badge indicator
+        if (state.combo >= 2) {
+          comboBadge.textContent = `x${state.combo} STREAK`;
+          comboBadge.classList.remove('hidden');
+        } else {
+          comboBadge.classList.add('hidden');
+        }
+
+        // Timer urgency styling tailored for 30-second rounds
+        if (state.timeLeft <= 8 && state.mode === 'PLAYING') {
+          timerBox.classList.add('timer-urgent');
+          timerBox.style.backgroundColor = '#fef2f2';
+          timerDot.style.backgroundColor = PALETTE.red;
+          timerDisplay.style.color = PALETTE.red;
+        } else if (state.timeLeft <= 15 && state.mode === 'PLAYING') {
+          timerBox.classList.remove('timer-urgent');
+          timerBox.style.backgroundColor = '#fefce8';
+          timerDot.style.backgroundColor = PALETTE.yellowDark;
+          timerDisplay.style.color = PALETTE.black;
+        } else {
+          timerBox.classList.remove('timer-urgent');
+          timerBox.style.backgroundColor = PALETTE.white;
+          timerDot.style.backgroundColor = PALETTE.green;
+          timerDisplay.style.color = PALETTE.black;
+        }
+      }
+
+      function hideAllOverlays() {
+        startOverlay.classList.add('hidden');
+        roundClearOverlay.classList.add('hidden');
+        gameOverOverlay.classList.add('hidden');
+        pauseOverlay.classList.add('hidden');
+      }
+
+      function startGame() {
+        hideAllOverlays();
+        setupRound(1, false);
+        state.mode = 'PLAYING';
+        statusHint.textContent = 'Drag matching candies together within 30 seconds!';
+        updateHUD();
+      }
+
+      function advanceToNextRound() {
+        hideAllOverlays();
+        setupRound(state.round + 1, true);
+        state.mode = 'PLAYING';
+        statusHint.textContent = `Round ${state.round}: Reach ${state.roundGoal} pts in 30 seconds!`;
+        updateHUD();
+      }
+
+      function handleRoundCleared() {
+        state.mode = 'ROUND_CLEAR';
+        state.draggedCandyId = null;
+        AudioFX.roundClear();
+
+        // Award time bonus for remaining seconds
+        const timeBonus = Math.max(5, Math.ceil(state.timeLeft));
+        state.totalScore += timeBonus;
+        updateHUD();
+
+        const nextGoal = BASE_GOAL + state.round * GOAL_STEP;
+        roundClearTitle.textContent = `ROUND ${state.round} COMPLETE`;
+        clearScoreVal.textContent = `${state.totalScore} pts`;
+        clearBonusVal.textContent = `+${timeBonus} pts`;
+        nextGoalVal.textContent = `${nextGoal} pts`;
+        nextRoundBtn.textContent = `START ROUND ${state.round + 1}`;
+
+        roundClearOverlay.classList.remove('hidden');
+      }
+
+      function handleGameOver() {
+        state.mode = 'GAME_OVER';
+        state.draggedCandyId = null;
+        AudioFX.gameOver();
+        updateHUD();
+
+        finalScoreVal.textContent = `${state.totalScore} pts`;
+        finalRoundVal.textContent = `Round ${state.round}`;
+        finalPairsVal.textContent = String(state.pairsMatchedTotal);
+
+        gameOverOverlay.classList.remove('hidden');
+      }
+
+      // =========================================================================
+      // 7. PARTICLE & FLOATING SCORE FEEDBACK
+      // =========================================================================
+      function spawnMatchBurst(x, y, colors) {
+        for (let i = 0; i < 20; i++) {
+          const angle = (Math.PI * 2 * i) / 20 + (Math.random() - 0.5) * 0.3;
+          const speed = 90 + Math.random() * 190;
+          state.particles.push({
+            x,
+            y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            size: 4 + Math.random() * 5,
+            color: colors[i % colors.length],
+            life: 0.45 + Math.random() * 0.25,
+            maxLife: 0.7
+          });
+        }
+      }
+
+      function spawnLeafBurst(x, y) {
+        for (let i = 0; i < 5; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = 35 + Math.random() * 65;
+          state.particles.push({
+            x,
+            y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            size: 4 + Math.random() * 3,
+            color: i % 2 === 0 ? PALETTE.green : PALETTE.greenLight,
+            life: 0.35,
+            maxLife: 0.35
+          });
+        }
+      }
+
+      function spawnFloatingText(x, y, text, color) {
+        state.floatingTexts.push({
+          x,
+          y,
+          text,
+          color,
+          life: 0.85,
+          maxLife: 0.85
+        });
+      }
+
+      // =========================================================================
+      // 8. INPUT HANDLING (MOUSE & TOUCH DRAG-TO-PAIR)
+      // =========================================================================
+      function clientToArenaCoords(clientX, clientY) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = ARENA_LOGICAL_SIZE / rect.width;
+        const scaleY = ARENA_LOGICAL_SIZE / rect.height;
+        return {
+          x: (clientX - rect.left) * scaleX,
+          y: (clientY - rect.top) * scaleY
+        };
+      }
+
+      function handlePointerDown(clientX, clientY) {
+        if (state.mode !== 'PLAYING') return;
+        const pt = clientToArenaCoords(clientX, clientY);
+        state.pointerPos = pt;
+
+        // Find topmost candy within generous touch/click grab radius
+        let picked = null;
+        let bestDist = Infinity;
+        for (let i = state.candies.length - 1; i >= 0; i--) {
+          const c = state.candies[i];
+          const d = Math.hypot(pt.x - c.x, pt.y - c.y);
+          if (d <= c.r + 14 && d < bestDist) {
+            bestDist = d;
+            picked = c;
+          }
+        }
+
+        if (picked) {
+          state.draggedCandyId = picked.id;
+          state.dragOffset.x = picked.x - pt.x;
+          state.dragOffset.y = picked.y - pt.y;
+          AudioFX.pickup();
+        }
+      }
+
+      function handlePointerMove(clientX, clientY) {
+        const pt = clientToArenaCoords(clientX, clientY);
+        state.pointerPos = pt;
+      }
+
+      function handlePointerUp() {
+        state.draggedCandyId = null;
+      }
+
+      // Mouse Listeners
+      canvas.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        handlePointerDown(e.clientX, e.clientY);
+      });
+      window.addEventListener('mousemove', (e) => {
+        handlePointerMove(e.clientX, e.clientY);
+      });
+      window.addEventListener('mouseup', () => {
+        handlePointerUp();
+      });
+
+      // Touch Listeners
+      canvas.addEventListener('touchstart', (e) => {
+        if (e.touches.length > 0) {
+          e.preventDefault();
+          handlePointerDown(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      }, { passive: false });
+
+      canvas.addEventListener('touchmove', (e) => {
+        if (e.touches.length > 0) {
+          e.preventDefault();
+          handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
+        }
+      }, { passive: false });
+
+      window.addEventListener('touchend', () => {
+        handlePointerUp();
+      });
+
+      // UI Button Listeners
+      startBtn.addEventListener('click', startGame);
+      nextRoundBtn.addEventListener('click', advanceToNextRound);
+      restartBtn.addEventListener('click', startGame);
+
+      pauseBtn.addEventListener('click', () => {
+        if (state.mode === 'PLAYING') {
+          state.mode = 'PAUSED';
+          state.draggedCandyId = null;
+          pauseOverlay.classList.remove('hidden');
+        }
+      });
+
+      resumeBtn.addEventListener('click', () => {
+        if (state.mode === 'PAUSED') {
+          pauseOverlay.classList.add('hidden');
+          state.mode = 'PLAYING';
+          state.lastTimestamp = performance.now();
+        }
+      });
+
+      resetQuickBtn.addEventListener('click', () => {
+        startGame();
+      });
+
+      soundToggleBtn.addEventListener('click', () => {
+        const isOn = AudioFX.toggle();
+        soundToggleBtn.textContent = isOn ? 'Sound: ON' : 'Sound: OFF';
+      });
+
+      // =========================================================================
+      // 9. PHYSICS, PAIRING & ROUND PROGRESSION UPDATE LOOP
+      // =========================================================================
+      function triggerBushBump(x, y) {
+        let nearest = null;
+        let minDist = Infinity;
+        for (const b of state.bushes) {
+          const d = Math.hypot(b.x - x, b.y - y);
+          if (d < minDist) {
+            minDist = d;
+            nearest = b;
+          }
+        }
+        if (nearest && nearest.shake <= 0.05) {
+          nearest.shake = 1.0;
+          spawnLeafBurst(x, y);
+        }
+      }
+
+      function updateSimulation(dt) {
+        // Decay bush rustle shakes
+        for (const b of state.bushes) {
+          if (b.shake > 0) {
+            b.shake = Math.max(0, b.shake - dt * 4.5);
+          }
+        }
+
+        // Update particles
+        for (let i = state.particles.length - 1; i >= 0; i--) {
+          const p = state.particles[i];
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.vx *= 0.94;
+          p.vy *= 0.94;
+          p.life -= dt;
+          if (p.life <= 0) state.particles.splice(i, 1);
+        }
+
+        // Update floating texts
+        for (let i = state.floatingTexts.length - 1; i >= 0; i--) {
+          const ft = state.floatingTexts[i];
+          ft.y -= 42 * dt;
+          ft.life -= dt;
+          if (ft.life <= 0) state.floatingTexts.splice(i, 1);
+        }
+
+        if (state.mode !== 'PLAYING') return;
+
+        // Countdown 30-second round timer at accelerated speed
+        state.timeLeft -= dt * TIMER_SPEED_MULTIPLIER;
+        if (state.timeLeft <= 0) {
+          state.timeLeft = 0;
+          handleGameOver();
+          return;
+        }
+
+        // Combo decay
+        if (state.combo > 0) {
+          state.comboTimer -= dt;
+          if (state.comboTimer <= 0) {
+            state.combo = 0;
+          }
+        }
+
+        // Periodic Sugar Swirl in Round 2+ to gently stir candies
+        const cfg = getRoundConfig(state.round);
+        if (cfg.swirlInterval > 0) {
+          state.swirlTimer -= dt;
+          if (state.swirlTimer <= 0) {
+            state.swirlTimer = cfg.swirlInterval;
+            state.swirlPulse = 1.0;
+            const center = ARENA_LOGICAL_SIZE / 2;
+            for (const c of state.candies) {
+              if (c.id === state.draggedCandyId) continue;
+              const dx = c.x - center;
+              const dy = c.y - center;
+              const dist = Math.max(1, Math.hypot(dx, dy));
+              // Tangential swirl impulse
+              c.vx += (-dy / dist) * 65;
+              c.vy += (dx / dist) * 65;
+            }
+          }
+        }
+        if (state.swirlPulse > 0) {
+          state.swirlPulse = Math.max(0, state.swirlPulse - dt * 1.4);
+        }
+
+        // Update candy positions & bush barrier collisions
+        const draggedCandy = state.candies.find(c => c.id === state.draggedCandyId) || null;
+
+        for (const c of state.candies) {
+          c.scale += (1 - c.scale) * Math.min(1, dt * 12);
+          c.wobble += dt * 3.5;
+
+          if (draggedCandy && c.id === draggedCandy.id) {
+            // Smooth cursor tracking clamped strictly inside bush walls
+            const targetX = Math.max(PLAY_MIN + c.r, Math.min(PLAY_MAX - c.r, state.pointerPos.x + state.dragOffset.x));
+            const targetY = Math.max(PLAY_MIN + c.r, Math.min(PLAY_MAX - c.r, state.pointerPos.y + state.dragOffset.y));
+            c.vx = (targetX - c.x) * 18;
+            c.vy = (targetY - c.y) * 18;
+            c.x = targetX;
+            c.y = targetY;
+          } else {
+            c.x += c.vx * dt;
+            c.y += c.vy * dt;
+
+            // Keep drift speeds bounded
+            const speed = Math.hypot(c.vx, c.vy);
+            const maxSpeed = cfg.driftSpeed * 1.6;
+            if (speed > maxSpeed) {
+              c.vx = (c.vx / speed) * maxSpeed;
+              c.vy = (c.vy / speed) * maxSpeed;
+            }
+
+            // Bush barrier reflections on all 4 sides
+            if (c.x - c.r < PLAY_MIN) {
+              c.x = PLAY_MIN + c.r;
+              c.vx = Math.abs(c.vx);
+              triggerBushBump(PLAY_MIN, c.y);
+            } else if (c.x + c.r > PLAY_MAX) {
+              c.x = PLAY_MAX - c.r;
+              c.vx = -Math.abs(c.vx);
+              triggerBushBump(PLAY_MAX, c.y);
+            }
+
+            if (c.y - c.r < PLAY_MIN) {
+              c.y = PLAY_MIN + c.r;
+              c.vy = Math.abs(c.vy);
+              triggerBushBump(c.x, PLAY_MIN);
+            } else if (c.y + c.r > PLAY_MAX) {
+              c.y = PLAY_MAX - c.r;
+              c.vy = -Math.abs(c.vy);
+              triggerBushBump(c.x, PLAY_MAX);
+            }
+          }
+        }
+
+        // Candy-to-Candy interactions: matching pair merge vs non-matching bump
+        let matchedPair = null;
+        for (let i = 0; i < state.candies.length; i++) {
+          for (let j = i + 1; j < state.candies.length; j++) {
+            const a = state.candies[i];
+            const b = state.candies[j];
+            const dx = b.x - a.x;
+            const dy = b.y - a.y;
+            const dist = Math.hypot(dx, dy);
+            const isDraggingEither = (a.id === state.draggedCandyId || b.id === state.draggedCandyId);
+
+            if (a.typeId === b.typeId && isDraggingEither && dist <= a.r + b.r + 12) {
+              matchedPair = [a, b];
+              break;
+            } else if (dist < a.r + b.r && dist > 0.001) {
+              // Elastic separation bump
+              const overlap = (a.r + b.r - dist) * 0.5;
+              const nx = dx / dist;
+              const ny = dy / dist;
+
+              if (a.id !== state.draggedCandyId) {
+                a.x -= nx * overlap;
+                a.y -= ny * overlap;
+                a.vx -= nx * 40;
+                a.vy -= ny * 40;
+              }
+              if (b.id !== state.draggedCandyId) {
+                b.x += nx * overlap;
+                b.y += ny * overlap;
+                b.vx += nx * 40;
+                b.vy += ny * 40;
+              }
+            }
+          }
+          if (matchedPair) break;
+        }
+
+        // Process matched pair scoring
+        if (matchedPair) {
+          const [c1, c2] = matchedPair;
+          const midX = (c1.x + c2.x) * 0.5;
+          const midY = (c1.y + c2.y) * 0.5;
+
+          state.candies = state.candies.filter(c => c.id !== c1.id && c.id !== c2.id);
+          if (state.draggedCandyId === c1.id || state.draggedCandyId === c2.id) {
+            state.draggedCandyId = null;
+          }
+
+          state.combo += 1;
+          state.comboTimer = 3.2;
+          state.pairsMatchedTotal += 1;
+
+          const bonus = state.combo >= 2 ? (state.combo - 1) * 5 : 0;
+          const pointsGained = BASE_PAIR_POINTS + bonus;
+
+          state.roundScore += pointsGained;
+          state.totalScore += pointsGained;
+
+          AudioFX.match(state.combo);
+          spawnMatchBurst(midX, midY, [c1.type.primary, c1.type.secondary, PALETTE.yellow, PALETTE.green]);
+          spawnFloatingText(
+            midX,
+            midY - 12,
+            bonus > 0 ? `+${pointsGained} (x${state.combo})` : `+${pointsGained}`,
+            c1.type.primary === PALETTE.white ? PALETTE.black : c1.type.primary
+          );
+
+          // Spawn a fresh replacement pair to keep the arena populated
+          const nextTypeIdx = Math.floor(Math.random() * cfg.unlockedTypes);
+          spawnCandyPair(nextTypeIdx, cfg.driftSpeed);
+
+          // Check if round requirement is met
+          if (state.roundScore >= state.roundGoal) {
+            handleRoundCleared();
+            return;
+          }
+        }
+
+        updateHUD();
+      }
+
+      // =========================================================================
+      // 10. TOP-DOWN ARENA & CANDY RENDERER
+      // =========================================================================
+      function drawArenaFloor() {
+        // Crisp white square arena floor
+        ctx.fillStyle = PALETTE.white;
+        ctx.fillRect(0, 0, ARENA_LOGICAL_SIZE, ARENA_LOGICAL_SIZE);
+
+        // Minimalist subtle polka-dot grid inside play area
+        ctx.fillStyle = 'rgba(10, 10, 12, 0.06)';
+        const spacing = 48;
+        for (let x = PLAY_MIN + 24; x < PLAY_MAX; x += spacing) {
+          for (let y = PLAY_MIN + 24; y < PLAY_MAX; y += spacing) {
+            ctx.beginPath();
+            ctx.arc(x, y, 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+
+        // Subtle Sugar Swirl wave indicator when active
+        if (state.swirlPulse > 0) {
+          ctx.save();
+          ctx.strokeStyle = `rgba(37, 99, 235, ${state.swirlPulse * 0.35})`;
+          ctx.lineWidth = 6;
+          ctx.beginPath();
+          ctx.arc(
+            ARENA_LOGICAL_SIZE / 2,
+            ARENA_LOGICAL_SIZE / 2,
+            (1 - state.swirlPulse) * 320 + 40,
+            0,
+            Math.PI * 2
+          );
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+
+      function drawBushBarriers() {
+        // Solid green hedge base strips along all 4 sides
+        ctx.fillStyle = PALETTE.greenDark;
+        ctx.fillRect(0, 0, ARENA_LOGICAL_SIZE, BUSH_MARGIN - 8);
+        ctx.fillRect(0, ARENA_LOGICAL_SIZE - (BUSH_MARGIN - 8), ARENA_LOGICAL_SIZE, BUSH_MARGIN - 8);
+        ctx.fillRect(0, 0, BUSH_MARGIN - 8, ARENA_LOGICAL_SIZE);
+        ctx.fillRect(ARENA_LOGICAL_SIZE - (BUSH_MARGIN - 8), 0, BUSH_MARGIN - 8, ARENA_LOGICAL_SIZE);
+
+        // Draw leafy bush clusters with crisp black outlines & colorful berries
+        for (const b of state.bushes) {
+          const offsetX = b.shake > 0 ? Math.sin(b.shake * 28) * 3.5 : 0;
+          const offsetY = b.shake > 0 ? Math.cos(b.shake * 24) * 3.5 : 0;
+          const bx = b.x + offsetX;
+          const by = b.y + offsetY;
+
+          // Outer dark green bush silhouette
+          ctx.beginPath();
+          ctx.arc(bx, by, b.radius, 0, Math.PI * 2);
+          ctx.fillStyle = PALETTE.green;
+          ctx.fill();
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = PALETTE.black;
+          ctx.stroke();
+
+          // Inner bright green foliage highlight
+          ctx.beginPath();
+          ctx.arc(bx - 5, by - 5, b.radius * 0.62, 0, Math.PI * 2);
+          ctx.fillStyle = PALETTE.greenLight;
+          ctx.fill();
+
+          // Decorative berries on bush
+          for (const berry of b.berries) {
+            ctx.beginPath();
+            ctx.arc(bx + berry.dx, by + berry.dy, 4.2, 0, Math.PI * 2);
+            ctx.fillStyle = b.berryColor;
+            ctx.fill();
+            ctx.lineWidth = 1.5;
+            ctx.strokeStyle = PALETTE.black;
+            ctx.stroke();
+          }
+        }
+      }
+
+      function drawCandyPiece(c, isDragged, isMatchingTwin) {
+        ctx.save();
+        ctx.translate(c.x, c.y);
+
+        const hoverScale = isDragged ? 1.15 : 1.0;
+        const s = c.scale * hoverScale;
+        ctx.scale(s, s);
+
+        // Highlight ring when dragging or matching twin
+        if (isDragged || isMatchingTwin) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(0, 0, c.r + 8 + Math.sin(c.wobble * 2) * 2, 0, Math.PI * 2);
+          ctx.strokeStyle = isDragged ? PALETTE.black : PALETTE.blue;
+          ctx.lineWidth = 3;
+          ctx.setLineDash([6, 4]);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // Tactile drop shadow
+        ctx.beginPath();
+        ctx.arc(2, 4, c.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(10, 10, 12, 0.16)';
+        ctx.fill();
+
+        // Main candy body
+        ctx.beginPath();
+        ctx.arc(0, 0, c.r, 0, Math.PI * 2);
+        ctx.fillStyle = c.type.primary;
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = PALETTE.black;
+        ctx.stroke();
+
+        // Inner candy motif based on shape
+        if (c.type.shape === 'swirl') {
+          ctx.strokeStyle = c.type.secondary;
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          for (let a = 0; a < Math.PI * 3; a += 0.25) {
+            const rad = (a / (Math.PI * 3)) * (c.r - 6);
+            const sx = Math.cos(a) * rad;
+            const sy = Math.sin(a) * rad;
+            if (a === 0) ctx.moveTo(sx, sy);
+            else ctx.lineTo(sx, sy);
+          }
+          ctx.stroke();
+        } else if (c.type.shape === 'star') {
+          ctx.fillStyle = c.type.secondary;
+          ctx.beginPath();
+          for (let i = 0; i < 10; i++) {
+            const rad = i % 2 === 0 ? c.r * 0.58 : c.r * 0.26;
+            const ang = (i * Math.PI) / 5 - Math.PI / 2;
+            const px = Math.cos(ang) * rad;
+            const py = Math.sin(ang) * rad;
+            if (i === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+          }
+          ctx.closePath();
+          ctx.fill();
+        } else if (c.type.shape === 'heart') {
+          ctx.fillStyle = c.type.secondary;
+          ctx.beginPath();
+          ctx.arc(-5, -3, 5.5, 0, Math.PI * 2);
+          ctx.arc(5, -3, 5.5, 0, Math.PI * 2);
+          ctx.lineTo(0, 10);
+          ctx.closePath();
+          ctx.fill();
+        } else if (c.type.shape === 'ring') {
+          ctx.beginPath();
+          ctx.arc(0, 0, c.r * 0.44, 0, Math.PI * 2);
+          ctx.fillStyle = c.type.secondary;
+          ctx.fill();
+          ctx.lineWidth = 2.5;
+          ctx.strokeStyle = PALETTE.black;
+          ctx.stroke();
+        } else if (c.type.shape === 'diamond') {
+          ctx.fillStyle = c.type.secondary;
+          ctx.beginPath();
+          ctx.moveTo(0, -11);
+          ctx.lineTo(11, 0);
+          ctx.lineTo(0, 11);
+          ctx.lineTo(-11, 0);
+          ctx.closePath();
+          ctx.fill();
+        } else if (c.type.shape === 'bonbon') {
+          ctx.strokeStyle = c.type.secondary;
+          ctx.lineWidth = 5;
+          ctx.beginPath();
+          ctx.moveTo(-12, -12);
+          ctx.lineTo(12, 12);
+          ctx.moveTo(12, -12);
+          ctx.lineTo(-12, 12);
+          ctx.stroke();
+        } else {
+          // Berry spots
+          ctx.fillStyle = c.type.secondary;
+          ctx.beginPath();
+          ctx.arc(-6, -6, 3.5, 0, Math.PI * 2);
+          ctx.arc(7, -3, 2.8, 0, Math.PI * 2);
+          ctx.arc(0, 7, 3.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Glossy top-left shine highlight
+        ctx.beginPath();
+        ctx.arc(-c.r * 0.34, -c.r * 0.34, 4, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      function renderFrame() {
+        ctx.clearRect(0, 0, ARENA_LOGICAL_SIZE, ARENA_LOGICAL_SIZE);
+
+        drawArenaFloor();
+        drawBushBarriers();
+
+        const draggedCandy = state.candies.find(c => c.id === state.draggedCandyId) || null;
+
+        // Draw subtle dashed guide lines from dragged candy to matching twins
+        if (draggedCandy) {
+          for (const c of state.candies) {
+            if (c.id !== draggedCandy.id && c.typeId === draggedCandy.typeId) {
+              ctx.save();
+              ctx.beginPath();
+              ctx.moveTo(draggedCandy.x, draggedCandy.y);
+              ctx.lineTo(c.x, c.y);
+              ctx.strokeStyle = 'rgba(37, 99, 235, 0.32)';
+              ctx.lineWidth = 3;
+              ctx.setLineDash([8, 8]);
+              ctx.stroke();
+              ctx.restore();
+            }
+          }
+        }
+
+        // Draw non-dragged candies first, then dragged candy on top
+        for (const c of state.candies) {
+          if (draggedCandy && c.id === draggedCandy.id) continue;
+          const isTwin = draggedCandy && c.typeId === draggedCandy.typeId;
+          drawCandyPiece(c, false, isTwin);
+        }
+
+        if (draggedCandy) {
+          drawCandyPiece(draggedCandy, true, false);
+        }
+
+        // Render particles
+        for (const p of state.particles) {
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.fill();
+          ctx.lineWidth = 1.5;
+          ctx.strokeStyle = PALETTE.black;
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // Render floating score popups
+        for (const ft of state.floatingTexts) {
+          ctx.save();
+          ctx.globalAlpha = Math.min(1, (ft.life / ft.maxLife) * 1.4);
+          ctx.font = '900 22px Inter, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.lineWidth = 4;
+          ctx.strokeStyle = PALETTE.white;
+          ctx.strokeText(ft.text, ft.x, ft.y);
+          ctx.fillStyle = ft.color;
+          ctx.fillText(ft.text, ft.x, ft.y);
+          ctx.restore();
+        }
+      }
+
+      // =========================================================================
+      // 11. RESPONSIVE CANVAS SIZING & MAIN ANIMATION LOOP
+      // =========================================================================
+      function resizeCanvas() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const rect = arenaContainer.getBoundingClientRect();
+        const size = Math.max(240, Math.floor(rect.width));
+        canvas.width = size * dpr;
+        canvas.height = size * dpr;
+        ctx.setTransform((size * dpr) / ARENA_LOGICAL_SIZE, 0, 0, (size * dpr) / ARENA_LOGICAL_SIZE, 0, 0);
+        renderFrame();
+      }
+
+      function mainLoop(timestamp) {
+        if (!state.lastTimestamp) state.lastTimestamp = timestamp;
+        const dt = Math.min(0.05, (timestamp - state.lastTimestamp) / 1000);
+        state.lastTimestamp = timestamp;
+
+        updateSimulation(dt);
+        renderFrame();
+
+        requestAnimationFrame(mainLoop);
+      }
+
+      window.addEventListener('resize', resizeCanvas);
+
+      window.onload = function () {
+        generateBushes();
+        setupRound(1, false);
+        resizeCanvas();
+        state.lastTimestamp = performance.now();
+        requestAnimationFrame(mainLoop);
+      };
+    })();
+  </script>
+</body>
+</html>
